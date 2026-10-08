@@ -1,0 +1,236 @@
+{
+  "date_utc": "2026-10-08T16:23:18.265485+00:00",
+  "currency": "USD",
+  "items": {
+    "sql_basic": [
+      {
+        "productName": "SQL Database Single Basic",
+        "skuName": "B",
+        "meterName": "B DTU",
+        "retailPrice": 0.1771,
+        "unitOfMeasure": "1/Day",
+        "type": "Consumption",
+        "effectiveStartDate": "2016-04-25T00:00:00Z"
+      }
+    ],
+    "container_apps": [
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Hybrid",
+        "meterName": "Hybrid vCPU Usage",
+        "retailPrice": 0.216,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2024-12-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Dedicated",
+        "meterName": "Dedicated Memory Usage",
+        "retailPrice": 0.006638,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Environment",
+        "meterName": "Environment Management Hour",
+        "retailPrice": 0.12,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2026-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard Requests",
+        "retailPrice": 0.4,
+        "unitOfMeasure": "1M",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Environment",
+        "meterName": "Environment Planned Maintenance Hour",
+        "retailPrice": 0.12,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2026-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Dedicated",
+        "meterName": "Dedicated Plan Management",
+        "retailPrice": 0.1,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Dedicated",
+        "meterName": "Dedicated vCPU Usage",
+        "retailPrice": 0.080859,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard Memory Active Usage",
+        "retailPrice": 4e-06,
+        "unitOfMeasure": "1 GiB Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard vCPU Active Usage",
+        "retailPrice": 3.4e-05,
+        "unitOfMeasure": "1 Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard vCPU Idle Usage",
+        "retailPrice": 4e-06,
+        "unitOfMeasure": "1 Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard NC T4 v3 GPU Usage",
+        "retailPrice": 8.8e-05,
+        "unitOfMeasure": "1 Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2026-04-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard Memory Idle Usage",
+        "retailPrice": 4e-06,
+        "unitOfMeasure": "1 GiB Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Environment",
+        "meterName": "Environment Private Endpoint",
+        "retailPrice": 0.12,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2026-09-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard NC A100 v4 GPU Usage",
+        "retailPrice": 0.000635,
+        "unitOfMeasure": "1 Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2026-04-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Dynamic Sessions",
+        "meterName": "Dynamic Sessions",
+        "retailPrice": 0.03,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2026-04-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Dedicated",
+        "meterName": "Dedicated GPU Usage",
+        "retailPrice": 5.28912,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2026-04-01T00:00:00Z"
+      }
+    ],
+    "openai": [
+      {
+        "productName": "Azure OpenAI",
+        "skuName": "gpt 4.1 mini Inp glbl",
+        "meterName": "gpt 4.1 mini Inp glbl Tokens",
+        "retailPrice": 0.0004,
+        "unitOfMeasure": "1K",
+        "type": "Consumption",
+        "effectiveStartDate": "2025-04-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure OpenAI",
+        "skuName": "gpt 4.1 mini Outp glbl",
+        "meterName": "gpt 4.1 mini Outp glbl Tokens",
+        "retailPrice": 0.0016,
+        "unitOfMeasure": "1K",
+        "type": "Consumption",
+        "effectiveStartDate": "2025-04-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure OpenAI",
+        "skuName": "gpt 4.1 mini cached Inp glbl",
+        "meterName": "gpt 4.1 mini cached Inp glbl Tokens",
+        "retailPrice": 0.0001,
+        "unitOfMeasure": "1K",
+        "type": "Consumption",
+        "effectiveStartDate": "2025-04-01T00:00:00Z"
+      }
+    ],
+    "private_link": [],
+    "registry": [
+      {
+        "productName": "Container Registry",
+        "skuName": "Basic",
+        "meterName": "Task vCPU Duration",
+        "retailPrice": 0.0,
+        "unitOfMeasure": "1 Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2019-04-01T00:00:00Z"
+      },
+      {
+        "productName": "Container Registry",
+        "skuName": "Basic",
+        "meterName": "Task vCPU Duration",
+        "retailPrice": 0.0001,
+        "unitOfMeasure": "1 Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2019-04-01T00:00:00Z"
+      },
+      {
+        "productName": "Container Registry",
+        "skuName": "Basic",
+        "meterName": "Data Stored",
+        "retailPrice": 0.1,
+        "unitOfMeasure": "1 GB/Month",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-02-20T00:00:00Z"
+      },
+      {
+        "productName": "Container Registry",
+        "skuName": "Basic",
+        "meterName": "Basic Registry Unit",
+        "retailPrice": 0.1666,
+        "unitOfMeasure": "1/Day",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-01-01T00:00:00Z"
+      }
+    ]
+  },
+  "sql_basic_has_more": false,
+  "container_apps_has_more": false,
+  "openai_has_more": false,
+  "private_link_has_more": false,
+  "registry_has_more": false
+}

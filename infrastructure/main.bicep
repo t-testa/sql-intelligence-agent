@@ -1,4 +1,4 @@
-// M2 foundation only. Review costs, tenant and region, then obtain explicit approval before deployment.
+// PRIVATE foundation proposal. Compile only until identities, network, costs and changes are approved.
 targetScope = 'resourceGroup'
 
 param location string = resourceGroup().location
@@ -8,7 +8,11 @@ param prefix string = 'sqlintel'
 @description('Object ID of the explicitly approved Entra SQL administrator group.')
 param sqlAdminObjectId string
 param sqlAdminDisplayName string
-param deployKeyVault bool = false
+param existingOpenaiName string
+param existingOpenaiResourceGroup string
+param existingOpenaiSubscriptionId string = subscription().subscriptionId
+@description('Explicit migration-host subnet only; empty means no migration access to private endpoints.')
+param migrationSubnetPrefix string = ''
 
 var suffix = uniqueString(resourceGroup().id)
 var tags = { project: 'sql-intelligence-agent', data: 'synthetic', milestone: 'M2' }
@@ -17,6 +21,63 @@ resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' 
   name: '${prefix}-runtime'
   location: location
   tags: tags
+}
+
+resource frontendIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: '${prefix}-frontend'
+  location: location
+  tags: tags
+}
+
+// Private endpoint NSG rules exclude the browser/VPN subnet from SQL and token storage.
+resource endpointSecurity 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
+  name: '${prefix}-endpoint-nsg'
+  location: location
+  tags: tags
+  properties: {
+    securityRules: concat([
+      {
+        name: 'AllowApplicationSubnet'
+        properties: {
+          priority: 100
+          access: 'Allow'
+          direction: 'Inbound'
+          protocol: 'Tcp'
+          sourceAddressPrefix: '10.48.0.0/23'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '10.48.2.0/24'
+          destinationPortRanges: ['443', '1433']
+        }
+      }
+      {
+        name: 'DenyOtherInbound'
+        properties: {
+          priority: 4000
+          access: 'Deny'
+          direction: 'Inbound'
+          protocol: '*'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '*'
+        }
+      }
+    ], empty(migrationSubnetPrefix) ? [] : [
+      {
+        name: 'AllowApprovedMigrationSubnet'
+        properties: {
+          priority: 110
+          access: 'Allow'
+          direction: 'Inbound'
+          protocol: 'Tcp'
+          sourceAddressPrefix: migrationSubnetPrefix
+          sourcePortRange: '*'
+          destinationAddressPrefix: '10.48.2.0/24'
+          destinationPortRange: '1433'
+        }
+      }
+    ])
+  }
 }
 
 resource network 'Microsoft.Network/virtualNetworks@2023-09-01' = {
@@ -37,7 +98,8 @@ resource network 'Microsoft.Network/virtualNetworks@2023-09-01' = {
         name: 'private-endpoints'
         properties: {
           addressPrefix: '10.48.2.0/24'
-          privateEndpointNetworkPolicies: 'Disabled'
+          privateEndpointNetworkPolicies: 'Enabled'
+          networkSecurityGroup: { id: endpointSecurity.id }
         }
       }
     ]
@@ -68,11 +130,12 @@ resource insights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-resource environment 'Microsoft.App/managedEnvironments@2024-03-01' = {
+resource environment 'Microsoft.App/managedEnvironments@2025-07-01' = {
   name: '${prefix}-environment'
   location: location
   tags: tags
   properties: {
+    publicNetworkAccess: 'Disabled'
     vnetConfiguration: {
       infrastructureSubnetId: '${network.id}/subnets/container-apps'
       internal: true
@@ -115,35 +178,56 @@ resource database 'Microsoft.Sql/servers/databases@2023-08-01' = {
   sku: { name: 'Basic', tier: 'Basic', capacity: 5 }
   properties: { maxSizeBytes: 2147483648 }
 }
-
-resource openai 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
-  name: '${prefix}-ai-${suffix}'
-  location: location
-  tags: tags
-  kind: 'OpenAI'
-  sku: { name: 'S0' }
-  properties: {
-    customSubDomainName: '${prefix}-ai-${suffix}'
-    publicNetworkAccess: 'Disabled'
-    disableLocalAuth: true
-    networkAcls: { defaultAction: 'Deny', ipRules: [], virtualNetworkRules: [] }
-  }
+resource sqlConnectionPolicy 'Microsoft.Sql/servers/connectionPolicies@2023-08-01' = {
+  parent: sql
+  name: 'default'
+  properties: { connectionType: 'Proxy' }
 }
 
-// Narrow resource-scoped inference permission; no Contributor/Owner grants.
-resource openaiUser 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(openai.id, identity.id, 'openai-user')
-  scope: openai
+// REUSE ONLY. No new OpenAI account, deployment, role grant or existing-account network change.
+resource openai 'Microsoft.CognitiveServices/accounts@2023-05-01' existing = {
+  name: existingOpenaiName
+  scope: resourceGroup(existingOpenaiSubscriptionId, existingOpenaiResourceGroup)
+}
+
+resource tokenStorage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
+  name: '${prefix}auth${take(suffix, 8)}'
+  location: location
+  tags: tags
+  kind: 'StorageV2'
+  sku: { name: 'Standard_LRS' }
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd')
-    principalId: identity.properties.principalId
-    principalType: 'ServicePrincipal'
+    publicNetworkAccess: 'Disabled'
+    allowBlobPublicAccess: false
+    allowSharedKeyAccess: false
+    supportsHttpsTrafficOnly: true
+    minimumTlsVersion: 'TLS1_2'
+    networkAcls: { defaultAction: 'Deny', bypass: 'None' }
   }
+}
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
+  parent: tokenStorage
+  name: 'default'
+  properties: {}
+}
+resource tokenContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: blobService
+  name: 'auth-tokens'
+  properties: { publicAccess: 'None' }
+}
+
+resource registry 'Microsoft.ContainerRegistry/registries@2025-04-01' = {
+  name: '${prefix}images${take(suffix, 6)}'
+  location: location
+  tags: tags
+  sku: { name: 'Basic' }
+  properties: { adminUserEnabled: false, anonymousPullEnabled: false }
 }
 
 var privateServices = [
   { name: 'sql', id: sql.id, group: 'sqlServer', zone: 'privatelink${az.environment().suffixes.sqlServerHostname}' }
   { name: 'openai', id: openai.id, group: 'account', zone: 'privatelink.openai.azure.com' }
+  { name: 'authstore', id: tokenStorage.id, group: 'blob', zone: 'privatelink.blob.${az.environment().suffixes.storage}' }
 ]
 resource zones 'Microsoft.Network/privateDnsZones@2020-06-01' = [for service in privateServices: {
   name: service.zone
@@ -174,23 +258,6 @@ resource zoneGroups 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@202
   properties: { privateDnsZoneConfigs: [{ name: service.name, properties: { privateDnsZoneId: zones[i].id } }] }
 }]
 
-// Optional future secret store; M1/M2 runtime itself uses managed identities.
-resource vault 'Microsoft.KeyVault/vaults@2023-07-01' = if (deployKeyVault) {
-  name: '${prefix}-kv-${suffix}'
-  location: location
-  tags: tags
-  properties: {
-    tenantId: tenant().tenantId
-    sku: { family: 'A', name: 'standard' }
-    enableRbacAuthorization: true
-    enablePurgeProtection: true
-    softDeleteRetentionInDays: 7
-    publicNetworkAccess: 'Disabled'
-    networkAcls: { defaultAction: 'Deny', bypass: 'None' }
-    accessPolicies: []
-  }
-}
-
 output environmentName string = environment.name
 output sqlServerFqdn string = sql.properties.fullyQualifiedDomainName
 output runtimeIdentityName string = identity.name
@@ -198,3 +265,7 @@ output runtimePrincipalId string = identity.properties.principalId
 output runtimeClientId string = identity.properties.clientId
 output openaiEndpoint string = openai.properties.endpoint
 output insightsResourceId string = insights.id
+output frontendIdentityName string = frontendIdentity.name
+output frontendPrincipalId string = frontendIdentity.properties.principalId
+output registryServer string = registry.properties.loginServer
+output tokenStorageName string = tokenStorage.name

@@ -100,6 +100,7 @@ def create_app(
         version="0.1.0",
         lifespan=lifespan,
         docs_url="/docs" if config.app_env == "local" else None,
+        openapi_url="/openapi.json" if config.app_env == "local" else None,
         redoc_url=None,
     )
     app.add_middleware(BodyLimitMiddleware)

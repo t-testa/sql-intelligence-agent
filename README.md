@@ -1,38 +1,105 @@
 # SQL Intelligence Agent
 
-**Ask an operations question, inspect validated T-SQL, explore the result and practice writing it yourself.**
+**Private source • Private Azure application • Owner-approved Entra access only**
 
-A standalone portfolio and learning application using **Streamlit → FastAPI → SQL Server/Azure SQL**.
-The model proposes SQL through the Responses API; application policy and database permissions decide
-what can execute. All shipped data is synthetic and all financial amounts are CAD.
+This complete repository must remain **PRIVATE**. Application access and GitHub source access are
+granted and revoked independently. A separate sanitized public showcase is planned only after explicit
+content approval; no application source, executable backend, secrets or usable endpoints will be public.
+GitHub API metadata confirmed [t-testa/sql-intelligence-agent](https://github.com/t-testa/sql-intelligence-agent)
+is **private**, with Pages disabled, on October 8, 2026. See the [source publication audit](docs/GITHUB_PUBLICATION.md).
 
-## Current status
+**Ask a business question. Inspect the SQL. Verify the answer. Learn how the query works.**
 
-M1 is implemented and tested with a real SQL Server 2022 Developer container and deterministic
-Azure OpenAI mocks. The interface has chat, SQL inspection, result tables, optional charts, query
-lessons and independent practice comparisons. Mock mode recognizes 27 documented example questions;
-it does not claim unrestricted natural-language understanding.
+A Python portfolio application combining **Azure OpenAI, FastAPI, Streamlit and SQL Server**.
+Live inference generates new analytical queries; a SQL policy gateway and a restricted database identity
+control execution. **SQL Learning Mode is a permanent feature**, including independent practice comparisons.
 
-M2 includes Entra token validation, managed-identity adapters, private Azure Bicep templates and a
-deployment runbook. No Azure resources have been provisioned. M3/M4 remain future work; see the
-[implementation plan](docs/IMPLEMENTATION_PLAN.md) and [readiness gaps](docs/READINESS.md).
+All shipped business data is synthetic; its financial amounts are CAD. Cloud hosting remains gated by
+authentication, Azure acceptance tests and explicit owner approval.
 
-## Quick start — Docker
+![Live analytical query and validated SQL](docs/images/live-query.jpg)
 
-Prerequisites: Docker Desktop with Linux containers and at least 4 GB available memory; Python 3.10–3.12
-only to generate the local `.env`. No Azure credentials are needed for the demonstration.
+## Demonstrated capabilities
+
+- Natural-language filtering, aggregation, financial ratios and approved multi-table joins.
+- Nonrecursive CTEs, scalar subqueries, ROW_NUMBER, RANK, LAG and running totals.
+- Highest invoice per job with explicit NULL handling and deterministic tie-breaking.
+- Bounded conversation context and clarification of ambiguous business definitions.
+- Complete bounded results, generated SQL/parameters, AST-based explanations and learning exercises.
+- A deterministic 27-question mock catalog and recorded live replay without cloud API charges.
+
+For example:
+
+> For every job, show the invoice with the highest amount. Include JobID, InvoiceID, and Amount.
+> Use ROW_NUMBER(). Include jobs without invoices with NULL values. Break ties by the lowest InvoiceID.
+> Order by JobID.
+
+The live API smoke test returned **240 independently verified rows**. A second edge fixture tests jobs
+without invoices and equal-amount ties. New live questions do not need to be added to the mock catalog.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    U[User / Streamlit] --> A[Authenticated FastAPI]
+    A --> C[Owner-scoped conversation]
+    C --> M[Azure OpenAI Responses<br/>or deterministic mock]
+    M --> P[Strict proposal contract]
+    P --> G[SQL gateway<br/>AST, schema, columns, joins, parameters]
+    G --> D[Read-only SQL runtime<br/>SQL Server / Azure SQL]
+    D --> R[Complete bounded results]
+    R --> L[Grounded answer + SQL lesson]
+    L --> U
+    U --> E[Alternative practice SQL]
+    E --> G
+    E --> O[Independent reference + fixture comparison]
+```
+
+The model proposes SQL and never receives a database connection. Only seven reporting views are
+exposed. Financial views pre-aggregate invoice and expense facts independently to prevent fanout.
+See [architecture](ARCHITECTURE.md), [security](SECURITY.md) and [threat model](THREAT_MODEL.md).
+
+## Accuracy and release status
+
+The independent acceptance suite has **61 cases: 53 analytical queries and 8 clarification/refusal
+cases**, including 26 queries outside the original mock catalog. All 53 independently written reference
+queries match deterministic Python Decimal fixtures. Real live testing targets **sql-agent-model**
+(**gpt-4.1-mini 2025-04-14**, Canada East), not a mock.
+
+Current results, exact failure rates, retests, model receipts and release blockers are recorded in
+[the final verification report](docs/RELEASE_VERIFICATION.md). Earlier failures remain in
+[evaluation/recordings](evaluation/recordings), including quota errors and incorrect SQL proposals.
+The expected results were frozen before live testing.
+
+| Final October 8 verification | Result |
+|---|---:|
+| Fresh live queries | **53/53 (100%)** |
+| Clarification/refusal cases | **8/8 (100%)** |
+| Recorded replay, no cloud calls | **61/61** |
+| Windows / Linux regression suites, including private access | **443/443 each** |
+| Mandatory security tests / direct database denials | **198/198 / 6/6 each** |
+
+The initial live batch passed 35/61; quota and proposal failures were corrected and retested. Local
+acceptance passes. The delegated frontend adapter and independent API authorization pass offline tests;
+actual tenant configuration, private routing and Azure identity/database acceptance remain open. See
+[private deployment verification](docs/PRIVATE_VERIFICATION.md).
+
+This is a measured, finite development acceptance set. It does **not** establish universal SQL
+correctness, general query equivalence or zero hallucinations. Passing SQL validation alone does not
+establish that the query answers the intended business question.
+
+## Quick start — no Azure required
+
+Prerequisites: Docker Desktop with Linux containers and at least 4 GB memory; Python 3.10–3.12 for
+local initialization. Run from the repository root:
 
 ```powershell
 python -m scripts.init_local
-docker compose --profile app up -d --build
+docker compose --profile app up -d --build --wait
 ```
 
-Open **http://127.0.0.1:8501** and click **Ask this question** for “Show total invoiced by region.”
-The backend is at http://127.0.0.1:8000; local API documentation is at `/docs`. Protected API endpoints
-require the generated local bearer token. The frontend uses it server-side.
-
-On this initial build, `.env` has already been generated and the local containers were started.
-Initialization deliberately refuses to overwrite an existing `.env`.
+Open [the local application](http://127.0.0.1:8501/) and choose **Show total invoiced by region**.
+Initialization refuses to overwrite an existing `.env`. On an already configured checkout, skip it.
 
 | Region | Total invoiced (CAD) |
 |---|---:|
@@ -41,88 +108,118 @@ Initialization deliberately refuses to overwrite an existing `.env`.
 | North | 1,704,180.00 |
 | West | 1,131,968.00 |
 
-The source contains **60 customers, 240 jobs, 480 invoices, 720 expenses and 48 targets**.
+The normal seed has **60 customers, 240 jobs, 480 invoices, 720 expenses and 48 targets**.
+SQL, API and UI ports bind only to 127.0.0.1: 14339, 8000 and 8501. A generated local bearer token
+protects API operations. The frontend uses it server-side and has no SQL credentials.
 
-## Local Python development
+## Live Azure OpenAI
 
-Install Microsoft ODBC Driver 18 for SQL Server. Use **127.0.0.1**, not `localhost`, if Windows resolves
-localhost to IPv6 while Docker publishes IPv4.
+Use the already approved existing deployment; see [the complete live runbook](LIVE_AZURE_OPENAI.md).
+Privately configure `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_DEPLOYMENT=sql-agent-model` and
+`AZURE_OPENAI_API_KEY` in ignored `.env`; set `AZURE_OPENAI_MAX_OUTPUT_TOKENS=1000`.
+Preserve existing SQL credentials and `LOCAL_API_TOKEN`.
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\python -m pip install -r requirements-dev.lock
-python -m scripts.init_local  # only when .env does not exist
-docker compose up -d --wait sqlserver
-.venv\Scripts\python -m scripts.bootstrap_db
-.venv\Scripts\python -m scripts.demo
+.\.venv\Scripts\python.exe -m scripts.verify_live --check-config --docker
+docker compose -f compose.yaml -f compose.azure.yaml --profile app up -d --build --wait backend frontend
+# This next command makes one billable inference call:
+.\.venv\Scripts\python.exe -m scripts.verify_live --allow-cloud-call
 ```
 
-Run these in separate terminals from the repository root:
+The sidebar must say **Live Azure OpenAI** and show the deployment. The helper checks the running
+provider, submits the highest-invoice question through the authenticated API, then compares every row
+against an independent Python oracle. Starting the UI does not itself call the model. Host Python
+can use Azure identity instead of a resource key; cloud hosting requires managed identity and Entra.
+
+Return to mock mode with `docker compose --profile app up -d --wait backend frontend`.
+There is no automatic fallback from a failed live request to a mock answer.
+
+## SQL Learning Mode
+
+![Learning Mode and independent practice comparison](docs/images/learning-mode.jpg)
+
+Learning Mode remains available in both live and mock modes. **Generated SQL** shows the validated
+statement and bound parameters. **Learn & practice** explains table grain, filtering, aggregation,
+joins, CTEs, windows, NULLIF and ordering from the actual parsed SQL.
+
+Twenty-seven exercises have independently authored references. An alternative query passes through
+the same SQL gateway and database identity before comparison. Column positions, duplicate counts,
+exact numeric values, NULLs and required ordering matter. A query returning `COUNT(*) + 0.001` fails;
+small errors are not rounded away. Arbitrary new questions receive lessons but need a reviewed oracle
+before receiving an independent practice exercise. See [learning examples](SQL_LEARNING.md).
+
+## Security boundaries
+
+- Entra single-tenant sign-in and sole approved user; FastAPI independently validates signature,
+  tenant/audience/time, user, delegated scope and calling frontend. Local mode trusts one desktop operator.
+- Private ACA environment and SQL endpoints; deployment defaults API access off. Missing/expired
+  frontend authentication clears displayed results and requires sign-in again; no local-token fallback.
+- Strict SQL AST, view, column, join and function allowlists; typed ODBC parameters.
+- Actual database-level denials for base-table reads, internal fields, writes and object creation.
+- One SELECT/nonrecursive CTE only; no dynamic SQL, procedures, external/system tables or unsafe joins.
+- Ten-second SQL deadline, three concurrent queries, 500 rows and 256 KiB; oversized results fail visibly.
+- Inference request/token/daily budgets, bounded output and no automatic provider retries.
+- Learning Mode and follow-up questions cannot bypass any production authorization check.
+- Secrets stay out of Git, images, screenshots and application audit logs; source data is synthetic.
+
+Process-local budgets reset on restart and are not a cloud spending cap. Broad access requires persistent
+quotas, durable audit/monitoring and a security review. See [SECURITY.md](SECURITY.md).
+
+## Reproduce the evaluation
+
+For host development, create `.venv`, install `requirements-dev.lock` and Microsoft ODBC Driver 18,
+then follow [the live runbook](LIVE_AZURE_OPENAI.md) or use the Docker test profile:
 
 ```powershell
-.venv\Scripts\uvicorn backend.api.main:create_app --factory --host 127.0.0.1 --port 8000
-.venv\Scripts\streamlit run frontend/app.py --server.address 127.0.0.1
-```
-
-Stop the Docker API/frontend first if their ports are in use: `docker compose stop backend frontend`.
-The Docker runtime never receives the administrator password; migration/test containers do.
-
-## Verification
-
-```powershell
-.venv\Scripts\ruff check .
-.venv\Scripts\ruff format --check .
-.venv\Scripts\mypy
-.venv\Scripts\python -m pytest -m "not integration"
-$env:RUN_SQL_INTEGRATION='1'
-.venv\Scripts\python -m pytest --junitxml=artifacts/tests.xml
-.venv\Scripts\python -m scripts.evaluate
 docker compose --profile test run --build --rm tests
 ```
 
-SQL tests use a privileged local-only connection for independent reference queries and a rolled-back
-timeout test. The API has no such capability. Windows sandbox restrictions may require allowing
-localhost sockets for Pytest's in-process FastAPI client as well as SQL Server. See
-[EVALUATION.md](EVALUATION.md) for measured results. GitHub Actions runs offline and Linux SQL Server
-suites with a mocked model; no cloud keys or billable resources are needed.
+This runs real SQL Server reference, replay, security and Learning Mode tests with **zero model calls**.
+The test profile forces mock mode and clears Azure credentials. GitHub Actions runs the same offline
+and container suites. Locally, Ruff and strict mypy also run:
 
-## Azure OpenAI mode
+```powershell
+.\.venv\Scripts\ruff.exe check .
+.\.venv\Scripts\ruff.exe format --check .
+.\.venv\Scripts\mypy.exe
+```
 
-Use an existing, approved Azure OpenAI resource and Responses-compatible deployment. Set
-`AGENT_MODE=azure`, `AZURE_OPENAI_ENDPOINT` to its HTTPS resource origin and `AZURE_OPENAI_DEPLOYMENT`
-to the deployment name. Local development can use an API key or developer Azure identity. Cloud mode
-requires managed identity and Entra user authorization. Azure mode incurs inference charges.
+The [test methodology](EVALUATION.md) explains the frozen cases, separate edge database, independent
+oracles, complete-result comparison, deterministic narration, replay and failure classification.
+It does not use a model to grade its own output.
 
-The Docker app profile deliberately stays in mock mode; the new `compose.azure.yaml` override explicitly
-enables local live inference. The adapter uses the standard OpenAI client with Azure's
-`/openai/v1/` endpoint, strict function calling, one proposal tool, bounded output and `store=False`.
-See the official [function-calling guide](https://developers.openai.com/api/docs/guides/function-calling)
-and [Azure Responses guide](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/responses).
+## Azure deployment
 
-Follow [LIVE_AZURE_OPENAI.md](LIVE_AZURE_OPENAI.md) for exact configuration, Docker and host-identity
-commands, conversation limits and the first-query verification helper. `--check-config` is offline;
-`--allow-cloud-call` explicitly opts into one billable question. Live questions use the same gateway
-and restricted database principal. The 27-question mock catalog remains unchanged.
+Read [the private Azure release plan](docs/AZURE_RELEASE_PLAN.md) and
+[Entra configuration runbook](docs/PRIVATE_AUTH.md). It reuses existing Azure OpenAI and proposes private
+Azure SQL Basic, an internal Container Apps environment, separate managed identities, protected token
+storage, monitoring and an approved private browser route. Templates have compiled, not been applied.
 
-## Repository map
+The light-use subtotal is **about US$40–80/month before private user connectivity**; a new VPN/private
+DNS resolver needs a separate quote. This is not an approved total. Continuous sessions can cost more.
+Identity and predeployment checks must finish before requesting provisioning approval; real platform
+and SQL acceptance follow approved private provisioning before application use.
 
-| Directory | Responsibility |
-|---|---|
-| `backend/api` | Authenticated HTTP contracts, size limits and status handling |
-| `backend/agent` | Proposal providers, orchestration, grounded answers and lessons |
-| `backend/security` | Positive SQL policy, parameter compilation and Entra authentication |
-| `backend/database` | SQLAlchemy/pyodbc, deadlines, bounds and backend interface |
-| `backend/semantic` | Trusted view, column, grain and metric catalog |
-| `frontend` | Streamlit interface; no direct database access |
-| `sql` | Schema, approved views and independent expected fixtures |
-| `scripts` | Separate privileged bootstrap, deterministic seed and evaluation |
-| `tests` | Unit, security, integration and analytical evaluation suites |
-| `infrastructure` | Undeployed private Azure foundation and API templates |
+**No new billable resources, access grants, collaborators or public publication are authorized.**
+The [showcase plan](docs/PUBLIC_SHOWCASE_APPROVAL.md) defines permitted sanitized content for later
+review; no separate showcase has been created or published. The full source stays private.
 
-Documentation: [Architecture](ARCHITECTURE.md) · [Security](SECURITY.md) ·
-[Threat model](THREAT_MODEL.md) · [SQL learning](SQL_LEARNING.md) ·
-[Fabric and Power BI](FABRIC_INTEGRATION.md) · [Deployment](DEPLOYMENT.md).
+## Limits and known risks
 
-Stop with `docker compose stop`. `docker compose down` removes this project's containers but preserves
-data. Only when intentionally discarding this synthetic database, use `docker compose down -v`;
-that last command deletes the named volume.
+- Supported T-SQL is deliberately narrower than all valid SQL Server syntax; harmless unsupported SQL
+  can be rejected. Only reviewed customer and ranked-invoice joins are authorized.
+- MonthlyPerformance uses job-start cohorts and lifetime job amounts. Invoice-date trends use vInvoices.
+  “Revenue,” cash collected and business success are not guessed.
+- Conversations hold up to 12 accepted turns, expire after 30 minutes idle/restart, and do not include
+  result cells. Full/expired context returns an explicit error. History is not durable across replicas.
+- New phrasings can generate wrong or rejected SQL despite a passing acceptance corpus.
+- Finite synthetic fixtures cannot prove behavior on every dataset. Cloud SQL and actual tenant identities
+  require separate deployment verification.
+- Fabric/Power BI integration is documented future work; the Fabric backend remains disabled.
+
+Repository map: `backend/` API, agent, policy and database adapters; `frontend/` UI; `sql/` schema,
+views and baseline fixtures; `scripts/` local bootstrap/evaluation; `tests/` regressions;
+`evaluation/` private synthetic evidence; `infrastructure/` undeployed private templates.
+
+Stop locally with `docker compose stop`. `docker compose down` preserves the database volume.
+Only use `docker compose down -v` when intentionally deleting this project's synthetic databases.

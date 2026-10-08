@@ -1,0 +1,113 @@
+{
+  "started_utc": "2026-10-08T16:19:38.999677+00:00",
+  "mode": "live",
+  "deployment": "sql-agent-model",
+  "max_output_tokens": 1000,
+  "interval_seconds": 12.0,
+  "contract_sha256": "d79079d38508025b069e72a9d20f9ef9c12f92f32994b512a9eef428dbfb609f",
+  "suite_sha256": "a0d9d4c0920c7cc6047bf1dc7a9ccf85d3d4251940e24e8fe3994a571e46cc1b",
+  "prompt_sha256": "81617262e9378ae317ca88af6b26c6903b57940447ba26894a3b7d3a8cc9c22b",
+  "outcomes": [
+    {
+      "id": "segment_join",
+      "category": "joins",
+      "fixture": "baseline",
+      "question": "Using a join, show job counts and total contract value by customer segment; order by segment. Return exactly these columns in this order: Segment, JobCount, ContractValue.",
+      "failures": [],
+      "receipt": {
+        "deployment_requested": "sql-agent-model",
+        "response_id": "resp_04755b6c14f3e4c6016ac7c29b623c8196b122b7a90135ff81",
+        "request_id": "530c4466-55bc-43f1-b137-458056b0a1eb",
+        "model_returned": "sql-agent-model",
+        "status": "completed",
+        "usage": {
+          "input_tokens": 1548,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 70,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1618
+        },
+        "tool_calls": [
+          {
+            "name": "propose_query",
+            "arguments": "{\"action\":\"query\",\"sql\":\"SELECT c.Segment, COUNT(*) AS JobCount, SUM(j.ContractValue) AS ContractValue\\nFROM reporting.vJobs AS j\\nJOIN reporting.vCustomers AS c ON j.CustomerId = c.CustomerId\\nGROUP BY c.Segment\\nORDER BY c.Segment\",\"parameters\":[],\"clarification\":\"\"}"
+          }
+        ]
+      },
+      "proposal": {
+        "action": "query",
+        "sql": "SELECT c.Segment, COUNT(*) AS JobCount, SUM(j.ContractValue) AS ContractValue\nFROM reporting.vJobs AS j\nJOIN reporting.vCustomers AS c ON j.CustomerId = c.CustomerId\nGROUP BY c.Segment\nORDER BY c.Segment",
+        "parameters": [],
+        "clarification": ""
+      },
+      "validated_sql": "SELECT\n  [c].[segment] AS [segment],\n  COUNT(*) AS [jobcount],\n  SUM([j].[contractvalue]) AS [contractvalue]\nFROM [reporting].[vjobs] AS [j]\nJOIN [reporting].[vcustomers] AS [c]\n  ON [j].[customerid] = [c].[customerid]\nGROUP BY\n  [c].[segment]\nORDER BY\n  [segment]",
+      "result": {
+        "columns": [
+          "segment",
+          "jobcount",
+          "contractvalue"
+        ],
+        "rows": [
+          [
+            "Commercial",
+            80,
+            "2453880.00"
+          ],
+          [
+            "Industrial",
+            80,
+            "2467720.00"
+          ],
+          [
+            "Public",
+            80,
+            "2481560.00"
+          ]
+        ],
+        "row_count": 3,
+        "elapsed_ms": 0,
+        "truncated": false
+      },
+      "explanation": "The query returned 3 rows with segment, jobcount, contractvalue. The complete bounded result is shown below; financial amounts use CAD.",
+      "learning": {
+        "grain": "vCustomers: one row per customer; vJobs: one row per job",
+        "concepts": [
+          "SELECT",
+          "Table grain",
+          "JOIN",
+          "GROUP BY",
+          "Aggregation"
+        ],
+        "explanation": [
+          "Logical processing begins with FROM/JOIN, then WHERE, GROUP BY, HAVING, SELECT/window calculations, ORDER BY and TOP. The optimizer may execute differently.",
+          "The approved join preserves job grain: each job matches at most one customer, or one invoice ranked by ROW_NUMBER per JobId with rank = 1 in ON. LEFT JOIN keeps unmatched jobs with NULL values on the right.",
+          "GROUP BY produces one row per combination of grouping values.",
+          "Aggregates operate at the input grain. Margin percentage is a ratio of totals, not an average of job percentages."
+        ],
+        "cautions": [
+          "Joining invoice and expense detail multiplies amounts; pre-aggregate each fact by JobId.",
+          "Budget variance = budget minus expenses; positive is favorable. Currency is CAD.",
+          "Avoid functions on indexed filter columns when a date range can express the filter.",
+          "Valid and authorized SQL can still answer the wrong business question; inspect grain and filters. Practice uses an independent reference, not the generated proposal."
+        ],
+        "exercise_id": null
+      },
+      "elapsed_seconds": 2.297
+    }
+  ],
+  "total_input_tokens": 1548,
+  "total_output_tokens": 70,
+  "security_grade": "separate mandatory pytest gate",
+  "release_validated": false,
+  "total": 1,
+  "passed": 1,
+  "failed": 0,
+  "failure_classes": {},
+  "complete": true,
+  "completed_utc": "2026-10-08T16:19:51.254690+00:00"
+}

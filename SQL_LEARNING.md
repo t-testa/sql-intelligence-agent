@@ -1,5 +1,8 @@
 # SQL Learning Mode
 
+SQL Learning Mode is a permanent application feature. Its sidebar toggle controls lesson visibility;
+it does not remove the SQL display or change authorization. Live and mock modes both provide lessons.
+
 Start the app and select **Show total invoiced by region**. Results, Generated SQL and Learn & practice
 show the execution result, exact validated SQL/parameters and lessons tied to its AST.
 
@@ -28,8 +31,10 @@ transactions share an amount. Compare margin as a ratio of sums, not an average 
 
 Write an alternative SQL query for a verified example and click **Validate & compare**. The same
 gateway checks it before any execution. A separately authored reference query must match the committed
-Decimal fixture, then candidate/reference rows are compared as an unordered multiset. Column positions
-matter; aliases may differ. Duplicate counts matter. Numbers are compared to cents. The interface shows
+Decimal fixture, then candidate/reference rows are compared exactly. If the independent reference has
+an outer ORDER BY, row order must match; otherwise comparison uses a multiset retaining duplicates.
+Column positions matter; aliases may differ. Numeric values are compared without rounding away small
+errors, and NULL remains distinct from zero. The interface shows
 the independent reference SQL and result. A match proves only equivalence on this dataset.
 
 With the pinned Streamlit version, a form submission may return to the Results tab. The completion

@@ -58,7 +58,7 @@ services:
     environment:
       LOCAL_API_TOKEN: ${LOCAL_API_TOKEN}
       API_URL: http://backend:8000
-    command: ["streamlit", "run", "frontend/app.py", "--server.address=0.0.0.0", "--server.headless=true", "--browser.gatherUsageStats=false"]
+    command: ["python", "-m", "streamlit", "run", "frontend/app.py", "--server.address=0.0.0.0", "--server.headless=true", "--browser.gatherUsageStats=false"]
     ports: ["127.0.0.1:8501:8501"]
     depends_on:
       backend:
@@ -87,10 +87,11 @@ services:
       AZURE_OPENAI_API_KEY: ""
     volumes:
       - ./tests:/app/tests:ro
+      - ./evaluation:/app/evaluation:ro
       - ./requirements-dev.lock:/tmp/dev.lock:ro
       - ./pyproject.toml:/app/pyproject.toml:ro
       - ./artifacts:/app/artifacts
-    command: ["sh", "-c", "pip install -r /tmp/dev.lock && pytest -q --junitxml=artifacts/tests.xml && python -m scripts.evaluate"]
+    command: ["sh", "-c", "pip install -r /tmp/dev.lock && python -m scripts.bootstrap_validation && pytest -q --junitxml=artifacts/tests.xml && python -m scripts.evaluate"]
     depends_on:
       migrate:
         condition: service_completed_successfully

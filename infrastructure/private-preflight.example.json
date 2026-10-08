@@ -1,0 +1,10 @@
+{
+  "tenant_id": "",
+  "approved_user_object_id": "",
+  "owner_approval_recorded": false,
+  "api_client_id": "",
+  "frontend_client_id": "",
+  "private_redirect_uri": "",
+  "github_repository": "",
+  "existing_environment_resource_id": ""
+}

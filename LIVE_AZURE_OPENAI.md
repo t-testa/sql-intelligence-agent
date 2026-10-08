@@ -16,7 +16,8 @@ Results are never silently truncated. SQL authorization does not establish busin
 Before this preparation, Docker forced mock mode and the UI's chat history was display-only. Those
 gaps are fixed. The live adapter now accepts bounded conversation context; resource origins and full
 v1 base URLs normalize correctly; provider errors give sanitized configuration guidance. Automatic
-provider retries are disabled, and output defaults to 4,000 tokens. Failed questions are never silently
+provider retries are disabled. Set output to 1,000 tokens for the verified `sql-agent-model` deployment
+(the generic Settings fallback is 4,000). Failed questions are never silently
 replaced with mock answers or automatically regenerated.
 
 ## Required resources and configuration
@@ -41,7 +42,10 @@ region, model, capacity and costs before creating them. This runbook does not pr
 | `AZURE_OPENAI_API_KEY` | Resource key for local key authentication; leave empty to use Azure identity on the host. The local Docker override requires a key. |
 | `AZURE_OPENAI_TOKEN_SCOPE` | Default `https://ai.azure.com/.default`; used only with identity authentication. |
 | `AZURE_OPENAI_TIMEOUT_SECONDS` | Default `30`, allowed 5–45. No automatic retries. |
-| `AZURE_OPENAI_MAX_OUTPUT_TOKENS` | Default `4000`, allowed 1000–8000. An incomplete response fails closed. |
+| `AZURE_OPENAI_MAX_OUTPUT_TOKENS` | Set `1000` for this deployment; allowed 1000–8000. An incomplete response fails closed. |
+| `AZURE_OPENAI_REQUESTS_PER_MINUTE` | Default `6`, shared by all users of one API process. |
+| `AZURE_OPENAI_TOKENS_PER_MINUTE` | Default `18000`, estimated input plus reserved maximum output. Azure enforces its own quota. |
+| `AZURE_OPENAI_DAILY_REQUEST_LIMIT` | Default `100` attempts per rolling 24 hours per process; restart resets it. |
 | `APP_ENV`, `AUTH_MODE` | Keep both `local` for this workflow. Live inference does not require `APP_ENV=cloud`. |
 | `LOCAL_API_TOKEN`, `SQL_*` | Keep the existing generated local token and restricted SQL credentials. |
 
@@ -59,8 +63,9 @@ host's Azure CLI login is not automatically available inside Docker.
 Full cloud hosting is separate: `APP_ENV=cloud` requires Entra user authorization, SQL managed identity,
 certificate verification and managed identity for OpenAI. It disallows API keys. `AZURE_CLIENT_ID`
 selects a user-assigned managed identity when supplied in the process environment. See
-[DEPLOYMENT.md](DEPLOYMENT.md) for tenant/audience/user allowlist and infrastructure requirements;
-the current Streamlit frontend still deliberately refuses cloud hosting until delegated sign-in is built.
+[DEPLOYMENT.md](DEPLOYMENT.md) and [private authentication](docs/PRIVATE_AUTH.md) for tenant/audience,
+frontend-client and user allowlists. The delegated Streamlit adapter is implemented and tested offline;
+actual tenant sign-in and private platform acceptance remain blocked pending approved configuration.
 
 ## Configure and start: Docker with a resource key
 
@@ -81,7 +86,7 @@ Set-Location 'C:\Users\Tony\Documents\ChatGPT\SQL Database Agent\sql-intelligenc
    ```
 
    This checks configuration syntax and key presence, not credential validity, network access, quota
-   or deployment compatibility. With the currently unconfigured Azure settings it intentionally fails.
+   or deployment compatibility. This workstation's existing deployment is `sql-agent-model`.
 3. After approving inference use, start the existing local application with the explicit override:
 
    ```powershell
@@ -210,7 +215,30 @@ $env:RUN_SQL_INTEGRATION='1'
 docker compose --profile test run --build --rm tests
 ```
 
-No Azure resource was created and no live inference was invoked while preparing this change. Offline
-SDK transport tests and real SQL Server execution tests establish the application path; they do not
-measure an Azure model's ability to generate correct SQL. First live verification awaits your configured
-resource, credentials and explicit decision to run a billable request.
+## Measured live verification
+
+On October 8, 2026, authorized inference used **sql-agent-model**, backed by **gpt-4.1-mini
+2025-04-14**, Canada East, GlobalStandard. The existing deployment reports **20 requests/minute and
+20,000 tokens/minute**. The first authenticated API smoke check returned all **240** expected highest
+invoices. See [the release report](docs/RELEASE_VERIFICATION.md) for the full evaluation and failures.
+No Azure resources were provisioned or made public during validation.
+
+Run independent references and recorded proposals without Azure charges:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.bootstrap_validation
+.\.venv\Scripts\python.exe -m scripts.release_eval --mode references --output artifacts/references-new.json
+.\.venv\Scripts\python.exe -m scripts.release_eval --mode replay --recording evaluation/recordings/accepted.json --output artifacts/replay-new.json
+```
+
+For an explicitly authorized new live measurement:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.release_eval --mode live --allow-cloud-call --interval-seconds 12 --output artifacts/live-new.json
+```
+
+Use a new evidence path each time. The harness refuses to overwrite recordings, stops on Azure 429,
+and does not automatically retry. Keep the UI idle during a batch so it does not share the deployment's
+quota. The process-local rate/daily guard is useful for a single-process demo; it is not a persistent
+spending cap or a multi-replica limiter. Long conversations can hit the estimated token limit and need a
+new conversation. Mock and replay runs require no inference credentials.

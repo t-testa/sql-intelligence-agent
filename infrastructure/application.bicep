@@ -9,8 +9,15 @@ param sqlServerFqdn string
 param openaiEndpoint string
 param openaiDeploymentName string
 param apiAudience string
+param frontendClientId string
+@description('Explicitly approved Entra tenant; never inferred from the deployment operator.')
+param entraTenantId string
 @minLength(1)
+@maxLength(1)
 param allowedUserObjectIds array
+@description('Fail closed until private cloud acceptance tests are explicitly enabled.')
+param applicationAccessEnabled bool = false
+param registryServer string
 param appName string = 'sql-intelligence-api'
 
 resource environment 'Microsoft.App/managedEnvironments@2024-03-01' existing = { name: environmentName }
@@ -25,6 +32,7 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
     workloadProfileName: 'Consumption'
     configuration: {
       activeRevisionsMode: 'Single'
+      registries: [{ server: registryServer, identity: identity.id }]
       ingress: { external: false, targetPort: 8000, allowInsecure: false, transport: 'http' }
     }
     template: {
@@ -36,9 +44,11 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
           { name: 'APP_ENV', value: 'cloud' }
           { name: 'AUTH_MODE', value: 'entra' }
           { name: 'AZURE_CLIENT_ID', value: runtimeClientId }
-          { name: 'ENTRA_TENANT_ID', value: tenant().tenantId }
+          { name: 'ENTRA_TENANT_ID', value: entraTenantId }
           { name: 'ENTRA_AUDIENCE', value: apiAudience }
+          { name: 'ENTRA_FRONTEND_CLIENT_ID', value: frontendClientId }
           { name: 'ENTRA_ALLOWED_OBJECT_IDS', value: string(allowedUserObjectIds) }
+          { name: 'APPLICATION_ACCESS_ENABLED', value: string(applicationAccessEnabled) }
           { name: 'SQL_HOST', value: sqlServerFqdn }
           { name: 'SQL_PORT', value: '1433' }
           { name: 'SQL_DATABASE', value: 'SQLIntelligence' }
@@ -48,6 +58,10 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
           { name: 'AGENT_MODE', value: 'azure' }
           { name: 'AZURE_OPENAI_ENDPOINT', value: openaiEndpoint }
           { name: 'AZURE_OPENAI_DEPLOYMENT', value: openaiDeploymentName }
+          { name: 'AZURE_OPENAI_MAX_OUTPUT_TOKENS', value: '1000' }
+          { name: 'AZURE_OPENAI_REQUESTS_PER_MINUTE', value: '6' }
+          { name: 'AZURE_OPENAI_TOKENS_PER_MINUTE', value: '18000' }
+          { name: 'AZURE_OPENAI_DAILY_REQUEST_LIMIT', value: '100' }
         ]
         probes: [{ type: 'Liveness', httpGet: { path: '/health', port: 8000 }, initialDelaySeconds: 30 }]
       }]

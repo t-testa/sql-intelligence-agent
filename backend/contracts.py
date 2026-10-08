@@ -16,9 +16,18 @@ class Parameter(Contract):
 
 class Proposal(Contract):
     action: Literal["query", "clarify"]
-    sql: str = Field(max_length=12000)
+    sql: str = Field(
+        max_length=12000,
+        description="For query: authorized T-SQL satisfying requested SQL learning constructs. "
+        "If the user explicitly requests a JOIN, include an approved JOIN, not just a denormalized view. "
+        "For clarify: the empty string.",
+    )
     parameters: list[Parameter] = Field(max_length=20)
-    clarification: str = Field(max_length=1000)
+    clarification: str = Field(
+        max_length=1000,
+        description="MUST be the empty string for action=query; never put an explanation here. "
+        "For action=clarify, ask a question or explain unsupported scope, with empty sql and parameters.",
+    )
 
     @model_validator(mode="after")
     def consistent(self) -> "Proposal":

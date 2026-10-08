@@ -69,3 +69,15 @@ def test_multiset_comparison_preserves_duplicates():
     a = ResultTable(columns=["x"], rows=[[1], [1], [2]], row_count=3, elapsed_ms=0)
     b = ResultTable(columns=["x"], rows=[[1], [2], [2]], row_count=3, elapsed_ms=0)
     assert canonical_rows(a) != canonical_rows(b)
+
+
+def test_financial_comparison_preserves_precision_beyond_decimal_context():
+    def result(value):
+        return ResultTable(columns=["amount"], rows=[[value]], row_count=1, elapsed_ms=0)
+
+    assert canonical_rows(result("1234567890123456789012345678.01")) != canonical_rows(
+        result("1234567890123456789012345678.02")
+    )
+    assert canonical_rows(result("1234567890123456789012345678.0100")) == canonical_rows(
+        result("1234567890123456789012345678.01")
+    )

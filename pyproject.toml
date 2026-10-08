@@ -31,7 +31,7 @@ addopts = "-ra"
 python_version = "3.10"
 strict = true
 ignore_missing_imports = true
-files = ["backend", "scripts"]
+files = ["backend", "scripts", "frontend/access.py"]
 
 [[tool.mypy.overrides]]
 module = ["sqlglot.*", "pyodbc.*"]

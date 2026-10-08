@@ -18,7 +18,8 @@ configured identities and migration artifacts.
 | Output injection | Deterministic summaries; plain-text UI; no model feedback loop | Retrieved instruction test; no HTML execution |
 | Secret/log leak | Ignored .env; runtime excludes admin credentials; sanitized errors and audit hashes | Local developer filesystem remains trusted |
 | Wrong but safe model query | Inspectable SQL, clarification, independent fixtures | Mock benchmark is not a claim of live model accuracy |
-| Cross-user leakage | Private local profile; explicit API users in cloud | Row-level security and delegated cloud frontend remain M4/M2 gates |
+| Cross-user leakage | Private local profile; delegated tokens and owner/client allowlists in cloud | Offline isolation/expiry/revocation tests pass; actual tenant flow remains M2; row-level scopes remain M4 |
+| Public source or endpoint exposure | PRIVATE repository policy, CI privacy guard, internal ACA/private SQL, independent API authorization | Remote visibility and private route still require verification; showcase creation/publication needs separate content approval |
 | Supply-chain regression | Exact dependency locks, pinned parser, CI | Lock updates require review; vulnerability scan/SBOM remains a readiness task |
 
 The privileged test process is not a production service. Its direct base-table queries exist only to

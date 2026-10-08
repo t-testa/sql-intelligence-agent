@@ -14,3 +14,41 @@ artifacts/
 *.egg-info/
 build/
 dist/
+
+# Local databases, backups, execution logs and temporary outputs.
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+*.mdf
+*.ndf
+*.ldf
+*.bak
+*.bacpac
+*.dump
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+tmp/
+temp/
+.cache/
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+
+# Credential files and private key material are never project source.
+.envrc
+*.pem
+*.key
+*.pfx
+*.p12
+*.jks
+credentials.json
+client_secret*.json
+
+# Reviewed evaluation/ fixtures, recordings and docs/images are intentional source evidence.

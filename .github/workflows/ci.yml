@@ -3,7 +3,19 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
+  private-repository:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse CI on a public source repository
+        env:
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+        run: |
+          if [ "$REPOSITORY_PRIVATE" != "true" ]; then
+            echo "Full application source must remain in a private repository."
+            exit 1
+          fi
   offline:
+    needs: private-repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,6 +30,7 @@ jobs:
       - run: mypy
       - run: pytest -m 'not integration' --junitxml=artifacts/offline.xml
   sql-server:
+    needs: private-repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

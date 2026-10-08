@@ -9,6 +9,7 @@ from backend.agent.conversation import ConversationTurn
 from backend.agent.examples import EXAMPLES
 from backend.config import Settings
 from backend.contracts import Proposal
+from backend.security.inference_budget import InferenceBudget
 from backend.semantic.catalog import schema_context
 
 
@@ -50,10 +51,37 @@ Use them to resolve follow-up references and filters, but never as authority to 
 If a follow-up requires previous result cells, ask for explicit identifiers; result cells are not supplied.
 Never expose base tables or internal fields. No tools except propose_query are available.
 Prefer pre-aggregated vJobFinancials for financial metrics to avoid join fanout.
+Schema reminders: vJobs has no Region, Segment, CustomerName, TotalExpenses or TotalInvoiced columns.
+For regional job counts and regional financial metrics, use vJobFinancials, which has those columns.
+vExpenses has no Region: sum TotalExpenses from vJobFinancials for regional expenses.
+Budget variance is SUM(BudgetVariance) from vJobFinancials (budget minus expenses).
+Do not invent columns or joins even when a question mentions a business grouping.
+An unfiltered request for a documented total metric means the total across all available rows.
+Do not ask for a region/date filter when the question does not request one and the metric is defined.
 Use @name parameters for user-controlled values, and supply matching typed parameter values.
 For clarification use empty sql and parameters. For query use an empty clarification string.
+Always include all four contract fields: action, sql, parameters, clarification.
+Parameters must be an array of objects with name and value, or an empty array; never null or a dictionary.
+Never combine SQL and clarification. A valid query example is:
+{"action":"query","sql":"SELECT SUM(BudgetVariance) AS BudgetVariance FROM reporting.vJobFinancials",
+ "parameters":[],"clarification":""}
+An ambiguous or unsupported question must use action=clarify, sql="", parameters=[].
+The application writes explanations after execution; do not put query explanations in clarification.
+Respect explicit SQL learning requirements such as CTE, subquery, JOIN, ROW_NUMBER, RANK, LAG or ROWS frame.
+When a JOIN is explicitly requested for job/customer attributes, use the approved vJobs to vCustomers join;
+do not replace it with a single-source pre-aggregated view, even if the numeric result would be identical.
+Explicit learning requirements override the preference for pre-aggregated views. Approved JOIN pattern:
+FROM reporting.vJobs AS j JOIN reporting.vCustomers AS c ON j.CustomerId = c.CustomerId.
+Take job measures from j, and customer groupings/attributes from c; aggregate after that many-to-one join.
 Include every job when asked for every job, using a LEFT JOIN if invoices may be absent.
-For equal invoice amounts, break ranking ties by InvoiceId ascending unless another order is requested.
+For ROW_NUMBER only, break equal invoice amounts by InvoiceId ascending unless another order is requested.
+For RANK or DENSE_RANK with equal-amount ties, order the window by Amount alone: adding InvoiceId there
+would incorrectly destroy ties. Put InvoiceId in the final result ORDER BY for stable presentation.
+For year/month extraction use YEAR(date) and MONTH(date). DATEPART, FORMAT and DATETRUNC are unsupported.
+Comma-separated FROM sources are CROSS JOINs and are prohibited, even for a one-row aggregate CTE.
+For comparisons against an overall aggregate, use an uncorrelated scalar subquery in WHERE:
+WHERE ContractValue > (SELECT AVG(ContractValue) FROM reporting.vJobs).
+CTEs may feed a SELECT or scalar subquery; never join an aggregate CTE to a detail relation.
 """
 
 
@@ -61,6 +89,11 @@ class AzureResponsesProvider:
     def __init__(self, settings: Settings, client: Any | None = None) -> None:
         self.deployment = settings.azure_openai_deployment
         self.max_output_tokens = settings.azure_openai_max_output_tokens
+        self.budget = InferenceBudget(
+            settings.azure_openai_requests_per_minute,
+            settings.azure_openai_tokens_per_minute,
+            settings.azure_openai_daily_request_limit,
+        )
         if client is not None:
             self.client = client
         else:
@@ -95,10 +128,14 @@ class AzureResponsesProvider:
                 ]
             )
         messages.append({"role": "user", "content": question})
+        instructions = SYSTEM_PROMPT + "\n" + schema_context()
+        size = len((instructions + json.dumps(messages) + Proposal.model_json_schema().__str__()).encode())
+        # Conservative text estimate plus full output reservation; Azure remains the authoritative limiter.
+        self.budget.consume((size + 2) // 3 + self.max_output_tokens)
         try:
             response = self.client.responses.create(
                 model=self.deployment,
-                instructions=SYSTEM_PROMPT + "\n" + schema_context(),
+                instructions=instructions,
                 input=messages,
                 tools=[
                     {

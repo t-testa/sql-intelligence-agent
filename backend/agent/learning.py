@@ -38,8 +38,10 @@ def explain(query: ValidatedQuery, exercise_id: str | None = None) -> Learning:
         (
             exp.Window,
             "Window function",
-            "A window function computes across a partition while "
-            "preserving rows. Include a deterministic ordering for rankings.",
+            "A window function computes across a partition while preserving rows. "
+            "ROW_NUMBER needs a unique tie-breaker when choosing one row. RANK/DENSE_RANK "
+            "preserve equal-value ties: a unique key inside their window ORDER BY would break those ties. "
+            "Use a final ORDER BY for stable presentation.",
         ),
         (exp.Nullif, "NULLIF", "NULLIF makes a zero denominator NULL, avoiding division by zero."),
         (

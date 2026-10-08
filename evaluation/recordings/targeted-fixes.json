@@ -1,0 +1,635 @@
+{
+  "started_utc": "2026-10-08T16:17:05.832171+00:00",
+  "mode": "live",
+  "deployment": "sql-agent-model",
+  "max_output_tokens": 1000,
+  "interval_seconds": 12.0,
+  "contract_sha256": "b27a235493efc35f26c8c9cbb565c1c4b3112947a9bc0cb9e06dedcfc665c5d1",
+  "suite_sha256": "a0d9d4c0920c7cc6047bf1dc7a9ccf85d3d4251940e24e8fe3994a571e46cc1b",
+  "prompt_sha256": "a486a0cd1f3631872824d9a34f01b320674590a7fd5b24d1825132afb4c8a91b",
+  "outcomes": [
+    {
+      "id": "baseline_margin",
+      "category": "baseline",
+      "fixture": "baseline",
+      "question": "What is gross margin? Return exactly these columns in this order: GrossMargin.",
+      "failures": [],
+      "receipt": {
+        "deployment_requested": "sql-agent-model",
+        "response_id": "resp_0485309e4e070cb5016ac7c2023de48190a6f163269273790e",
+        "request_id": "7e058c5d-69bd-4f07-8ba5-46bf11939f19",
+        "model_returned": "sql-agent-model",
+        "status": "completed",
+        "usage": {
+          "input_tokens": 1426,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 32,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1458
+        },
+        "tool_calls": [
+          {
+            "name": "propose_query",
+            "arguments": "{\"action\":\"query\",\"sql\":\"SELECT SUM(GrossMargin) AS GrossMargin FROM reporting.vJobFinancials\",\"parameters\":[],\"clarification\":\"\"}"
+          }
+        ]
+      },
+      "proposal": {
+        "action": "query",
+        "sql": "SELECT SUM(GrossMargin) AS GrossMargin FROM reporting.vJobFinancials",
+        "parameters": [],
+        "clarification": ""
+      },
+      "validated_sql": "SELECT\n  SUM([vjobfinancials].[grossmargin]) AS [grossmargin]\nFROM [reporting].[vjobfinancials] AS [vjobfinancials]",
+      "result": {
+        "columns": [
+          "grossmargin"
+        ],
+        "rows": [
+          [
+            "1702424.34"
+          ]
+        ],
+        "row_count": 1,
+        "elapsed_ms": 0,
+        "truncated": false
+      },
+      "explanation": "Verified query result \u2014 grossmargin: 1702424.34. Financial amounts use CAD.",
+      "learning": {
+        "grain": "vJobFinancials: one row per job; invoice and expense totals are pre-aggregated",
+        "concepts": [
+          "SELECT",
+          "Table grain",
+          "Aggregation"
+        ],
+        "explanation": [
+          "Logical processing begins with FROM/JOIN, then WHERE, GROUP BY, HAVING, SELECT/window calculations, ORDER BY and TOP. The optimizer may execute differently.",
+          "Aggregates operate at the input grain. Margin percentage is a ratio of totals, not an average of job percentages."
+        ],
+        "cautions": [
+          "Joining invoice and expense detail multiplies amounts; pre-aggregate each fact by JobId.",
+          "Budget variance = budget minus expenses; positive is favorable. Currency is CAD.",
+          "Avoid functions on indexed filter columns when a date range can express the filter.",
+          "Valid and authorized SQL can still answer the wrong business question; inspect grain and filters. Practice uses an independent reference, not the generated proposal."
+        ],
+        "exercise_id": null
+      },
+      "elapsed_seconds": 1.656
+    },
+    {
+      "id": "baseline_budget",
+      "category": "baseline",
+      "fixture": "baseline",
+      "question": "What is budget variance? Return exactly these columns in this order: BudgetVariance.",
+      "failures": [],
+      "receipt": {
+        "deployment_requested": "sql-agent-model",
+        "response_id": "resp_05dc6414df03fb76016ac7c20e2ecc8197817a19ad32b9972b",
+        "request_id": "af7593d8-865c-42f6-a70c-c45a9fb16961",
+        "model_returned": "sql-agent-model",
+        "status": "completed",
+        "usage": {
+          "input_tokens": 1426,
+          "input_tokens_details": {
+            "cached_tokens": 1280,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 32,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1458
+        },
+        "tool_calls": [
+          {
+            "name": "propose_query",
+            "arguments": "{\"action\":\"query\",\"sql\":\"SELECT SUM(BudgetVariance) AS BudgetVariance FROM reporting.vJobFinancials\",\"parameters\":[],\"clarification\":\"\"}"
+          }
+        ]
+      },
+      "proposal": {
+        "action": "query",
+        "sql": "SELECT SUM(BudgetVariance) AS BudgetVariance FROM reporting.vJobFinancials",
+        "parameters": [],
+        "clarification": ""
+      },
+      "validated_sql": "SELECT\n  SUM([vjobfinancials].[budgetvariance]) AS [budgetvariance]\nFROM [reporting].[vjobfinancials] AS [vjobfinancials]",
+      "result": {
+        "columns": [
+          "budgetvariance"
+        ],
+        "rows": [
+          [
+            "658812.34"
+          ]
+        ],
+        "row_count": 1,
+        "elapsed_ms": 0,
+        "truncated": false
+      },
+      "explanation": "Verified query result \u2014 budgetvariance: 658812.34. Financial amounts use CAD.",
+      "learning": {
+        "grain": "vJobFinancials: one row per job; invoice and expense totals are pre-aggregated",
+        "concepts": [
+          "SELECT",
+          "Table grain",
+          "Aggregation"
+        ],
+        "explanation": [
+          "Logical processing begins with FROM/JOIN, then WHERE, GROUP BY, HAVING, SELECT/window calculations, ORDER BY and TOP. The optimizer may execute differently.",
+          "Aggregates operate at the input grain. Margin percentage is a ratio of totals, not an average of job percentages."
+        ],
+        "cautions": [
+          "Joining invoice and expense detail multiplies amounts; pre-aggregate each fact by JobId.",
+          "Budget variance = budget minus expenses; positive is favorable. Currency is CAD.",
+          "Avoid functions on indexed filter columns when a date range can express the filter.",
+          "Valid and authorized SQL can still answer the wrong business question; inspect grain and filters. Practice uses an independent reference, not the generated proposal."
+        ],
+        "exercise_id": null
+      },
+      "elapsed_seconds": 1.375
+    },
+    {
+      "id": "segment_join",
+      "category": "joins",
+      "fixture": "baseline",
+      "question": "Using a join, show job counts and total contract value by customer segment; order by segment. Return exactly these columns in this order: Segment, JobCount, ContractValue.",
+      "failures": [
+        "requested_sql_construct_missing"
+      ],
+      "receipt": {
+        "deployment_requested": "sql-agent-model",
+        "response_id": "resp_03956129a77f5012016ac7c21a33048190a704e402774c577f",
+        "request_id": "ff24974f-fa2f-4da6-af6e-92efabc52a46",
+        "model_returned": "sql-agent-model",
+        "status": "completed",
+        "usage": {
+          "input_tokens": 1445,
+          "input_tokens_details": {
+            "cached_tokens": 1280,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 56,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1501
+        },
+        "tool_calls": [
+          {
+            "name": "propose_query",
+            "arguments": "{\"action\":\"query\",\"sql\":\"SELECT j.Segment, COUNT(*) AS JobCount, SUM(j.ContractValue) AS ContractValue\\nFROM reporting.vJobFinancials j\\nGROUP BY j.Segment\\nORDER BY j.Segment\",\"parameters\":[],\"clarification\":\"\"}"
+          }
+        ]
+      },
+      "proposal": {
+        "action": "query",
+        "sql": "SELECT j.Segment, COUNT(*) AS JobCount, SUM(j.ContractValue) AS ContractValue\nFROM reporting.vJobFinancials j\nGROUP BY j.Segment\nORDER BY j.Segment",
+        "parameters": [],
+        "clarification": ""
+      },
+      "validated_sql": "SELECT\n  [j].[segment] AS [segment],\n  COUNT(*) AS [jobcount],\n  SUM([j].[contractvalue]) AS [contractvalue]\nFROM [reporting].[vjobfinancials] AS [j]\nGROUP BY\n  [j].[segment]\nORDER BY\n  [segment]",
+      "result": {
+        "columns": [
+          "segment",
+          "jobcount",
+          "contractvalue"
+        ],
+        "rows": [
+          [
+            "Commercial",
+            80,
+            "2453880.00"
+          ],
+          [
+            "Industrial",
+            80,
+            "2467720.00"
+          ],
+          [
+            "Public",
+            80,
+            "2481560.00"
+          ]
+        ],
+        "row_count": 3,
+        "elapsed_ms": 15,
+        "truncated": false
+      },
+      "explanation": "The query returned 3 rows with segment, jobcount, contractvalue. The complete bounded result is shown below; financial amounts use CAD.",
+      "learning": {
+        "grain": "vJobFinancials: one row per job; invoice and expense totals are pre-aggregated",
+        "concepts": [
+          "SELECT",
+          "Table grain",
+          "GROUP BY",
+          "Aggregation"
+        ],
+        "explanation": [
+          "Logical processing begins with FROM/JOIN, then WHERE, GROUP BY, HAVING, SELECT/window calculations, ORDER BY and TOP. The optimizer may execute differently.",
+          "GROUP BY produces one row per combination of grouping values.",
+          "Aggregates operate at the input grain. Margin percentage is a ratio of totals, not an average of job percentages."
+        ],
+        "cautions": [
+          "Joining invoice and expense detail multiplies amounts; pre-aggregate each fact by JobId.",
+          "Budget variance = budget minus expenses; positive is favorable. Currency is CAD.",
+          "Avoid functions on indexed filter columns when a date range can express the filter.",
+          "Valid and authorized SQL can still answer the wrong business question; inspect grain and filters. Practice uses an independent reference, not the generated proposal."
+        ],
+        "exercise_id": null
+      },
+      "elapsed_seconds": 1.375
+    },
+    {
+      "id": "rank_ties",
+      "category": "rank",
+      "fixture": "baseline",
+      "question": "For invoices belonging to jobs 1 through 12, RANK each invoice by amount descending within its job. Equal amounts must have the same rank. Order by JobId and InvoiceId. Return exactly these columns in this order: JobId, InvoiceId, Amount, InvoiceRank.",
+      "failures": [],
+      "receipt": {
+        "deployment_requested": "sql-agent-model",
+        "response_id": "resp_03a46968d2c76748016ac7c22632948196abcf71c80d22c284",
+        "request_id": "5ace3050-9b00-4eeb-9ef9-78599b1f64d3",
+        "model_returned": "sql-agent-model",
+        "status": "completed",
+        "usage": {
+          "input_tokens": 1467,
+          "input_tokens_details": {
+            "cached_tokens": 1280,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 102,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1569
+        },
+        "tool_calls": [
+          {
+            "name": "propose_query",
+            "arguments": "{\"action\":\"query\",\"sql\":\"WITH RankedInvoices AS (\\n    SELECT\\n        JobId,\\n        InvoiceId,\\n        Amount,\\n        RANK() OVER (PARTITION BY JobId ORDER BY Amount DESC) AS InvoiceRank\\n    FROM reporting.vInvoices\\n    WHERE JobId BETWEEN 1 AND 12\\n)\\nSELECT JobId, InvoiceId, Amount, InvoiceRank\\nFROM RankedInvoices\\nORDER BY JobId, InvoiceId\",\"parameters\":[],\"clarification\":\"\"}"
+          }
+        ]
+      },
+      "proposal": {
+        "action": "query",
+        "sql": "WITH RankedInvoices AS (\n    SELECT\n        JobId,\n        InvoiceId,\n        Amount,\n        RANK() OVER (PARTITION BY JobId ORDER BY Amount DESC) AS InvoiceRank\n    FROM reporting.vInvoices\n    WHERE JobId BETWEEN 1 AND 12\n)\nSELECT JobId, InvoiceId, Amount, InvoiceRank\nFROM RankedInvoices\nORDER BY JobId, InvoiceId",
+        "parameters": [],
+        "clarification": ""
+      },
+      "validated_sql": "WITH [rankedinvoices] AS (\n  SELECT\n    [vinvoices].[jobid] AS [jobid],\n    [vinvoices].[invoiceid] AS [invoiceid],\n    [vinvoices].[amount] AS [amount],\n    RANK() OVER (PARTITION BY [vinvoices].[jobid] ORDER BY [vinvoices].[amount] DESC) AS [invoicerank]\n  FROM [reporting].[vinvoices] AS [vinvoices]\n  WHERE\n    [vinvoices].[jobid] BETWEEN 1 AND 12\n)\nSELECT\n  [rankedinvoices].[jobid] AS [jobid],\n  [rankedinvoices].[invoiceid] AS [invoiceid],\n  [rankedinvoices].[amount] AS [amount],\n  [rankedinvoices].[invoicerank] AS [invoicerank]\nFROM [rankedinvoices] AS [rankedinvoices]\nORDER BY\n  [jobid],\n  [invoiceid]",
+      "result": {
+        "columns": [
+          "jobid",
+          "invoiceid",
+          "amount",
+          "invoicerank"
+        ],
+        "rows": [
+          [
+            1,
+            1,
+            "4069.20",
+            2
+          ],
+          [
+            1,
+            2,
+            "6103.80",
+            1
+          ],
+          [
+            2,
+            3,
+            "4138.40",
+            2
+          ],
+          [
+            2,
+            4,
+            "6207.60",
+            1
+          ],
+          [
+            3,
+            5,
+            "4207.60",
+            2
+          ],
+          [
+            3,
+            6,
+            "6311.40",
+            1
+          ],
+          [
+            4,
+            7,
+            "4276.80",
+            2
+          ],
+          [
+            4,
+            8,
+            "6415.20",
+            1
+          ],
+          [
+            5,
+            9,
+            "2607.60",
+            2
+          ],
+          [
+            5,
+            10,
+            "3911.40",
+            1
+          ],
+          [
+            6,
+            11,
+            "4415.20",
+            2
+          ],
+          [
+            6,
+            12,
+            "6622.80",
+            1
+          ],
+          [
+            7,
+            13,
+            "4484.40",
+            2
+          ],
+          [
+            7,
+            14,
+            "6726.60",
+            1
+          ],
+          [
+            8,
+            15,
+            "4553.60",
+            2
+          ],
+          [
+            8,
+            16,
+            "6830.40",
+            1
+          ],
+          [
+            9,
+            17,
+            "4622.80",
+            2
+          ],
+          [
+            9,
+            18,
+            "6934.20",
+            1
+          ],
+          [
+            10,
+            19,
+            "2815.20",
+            2
+          ],
+          [
+            10,
+            20,
+            "4222.80",
+            1
+          ],
+          [
+            11,
+            21,
+            "4761.20",
+            2
+          ],
+          [
+            11,
+            22,
+            "7141.80",
+            1
+          ],
+          [
+            12,
+            23,
+            "0.00",
+            1
+          ],
+          [
+            12,
+            24,
+            "0.00",
+            1
+          ]
+        ],
+        "row_count": 24,
+        "elapsed_ms": 0,
+        "truncated": false
+      },
+      "explanation": "The query returned 24 rows with jobid, invoiceid, amount, invoicerank. The complete bounded result is shown below; financial amounts use CAD.",
+      "learning": {
+        "grain": "vInvoices: one row per invoice (many invoices per job)",
+        "concepts": [
+          "SELECT",
+          "Table grain",
+          "WHERE",
+          "CTE",
+          "Window function",
+          "Aggregation"
+        ],
+        "explanation": [
+          "Logical processing begins with FROM/JOIN, then WHERE, GROUP BY, HAVING, SELECT/window calculations, ORDER BY and TOP. The optimizer may execute differently.",
+          "WHERE filters input rows before aggregation.",
+          "A CTE names an intermediate query. It does not automatically materialize results or make a many-to-many join safe.",
+          "A window function computes across a partition while preserving rows. Include a deterministic ordering for rankings.",
+          "Aggregates operate at the input grain. Margin percentage is a ratio of totals, not an average of job percentages."
+        ],
+        "cautions": [
+          "Joining invoice and expense detail multiplies amounts; pre-aggregate each fact by JobId.",
+          "Budget variance = budget minus expenses; positive is favorable. Currency is CAD.",
+          "Avoid functions on indexed filter columns when a date range can express the filter.",
+          "Valid and authorized SQL can still answer the wrong business question; inspect grain and filters. Practice uses an independent reference, not the generated proposal."
+        ],
+        "exercise_id": null
+      },
+      "elapsed_seconds": 1.969
+    },
+    {
+      "id": "month_change",
+      "category": "month_over_month",
+      "fixture": "baseline",
+      "question": "Show invoice-posting month number, total invoiced, previous month's total and month-over-month absolute change using LAG. First previous/change is NULL. Order by month number. Return exactly these columns in this order: InvoiceMonth, TotalInvoiced, PreviousTotal, Change.",
+      "failures": [],
+      "receipt": {
+        "deployment_requested": "sql-agent-model",
+        "response_id": "resp_09b93f909f6082e0016ac7c23239348197bebd2cd0ac3e3923",
+        "request_id": "cf7377fc-ab7a-4989-9e9f-d4d0a4c206c4",
+        "model_returned": "sql-agent-model",
+        "status": "completed",
+        "usage": {
+          "input_tokens": 1466,
+          "input_tokens_details": {
+            "cached_tokens": 1280,
+            "cache_write_tokens": 0
+          },
+          "output_tokens": 167,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 1633
+        },
+        "tool_calls": [
+          {
+            "name": "propose_query",
+            "arguments": "{\"action\":\"query\",\"sql\":\"WITH MonthlyInvoicing AS (\\n    SELECT\\n        MONTH(InvoiceDate) AS InvoiceMonth,\\n        SUM(Amount) AS TotalInvoiced\\n    FROM reporting.vInvoices\\n    GROUP BY MONTH(InvoiceDate)\\n)\\nSELECT\\n    InvoiceMonth,\\n    TotalInvoiced,\\n    LAG(TotalInvoiced) OVER (ORDER BY InvoiceMonth) AS PreviousTotal,\\n    CASE \\n        WHEN LAG(TotalInvoiced) OVER (ORDER BY InvoiceMonth) IS NULL THEN NULL\\n        ELSE TotalInvoiced - LAG(TotalInvoiced) OVER (ORDER BY InvoiceMonth)\\n    END AS Change\\nFROM MonthlyInvoicing\\nORDER BY InvoiceMonth;\",\"parameters\":[],\"clarification\":\"\"}"
+          }
+        ]
+      },
+      "proposal": {
+        "action": "query",
+        "sql": "WITH MonthlyInvoicing AS (\n    SELECT\n        MONTH(InvoiceDate) AS InvoiceMonth,\n        SUM(Amount) AS TotalInvoiced\n    FROM reporting.vInvoices\n    GROUP BY MONTH(InvoiceDate)\n)\nSELECT\n    InvoiceMonth,\n    TotalInvoiced,\n    LAG(TotalInvoiced) OVER (ORDER BY InvoiceMonth) AS PreviousTotal,\n    CASE \n        WHEN LAG(TotalInvoiced) OVER (ORDER BY InvoiceMonth) IS NULL THEN NULL\n        ELSE TotalInvoiced - LAG(TotalInvoiced) OVER (ORDER BY InvoiceMonth)\n    END AS Change\nFROM MonthlyInvoicing\nORDER BY InvoiceMonth;",
+        "parameters": [],
+        "clarification": ""
+      },
+      "validated_sql": "WITH [monthlyinvoicing] AS (\n  SELECT\n    MONTH([vinvoices].[invoicedate]) AS [invoicemonth],\n    SUM([vinvoices].[amount]) AS [totalinvoiced]\n  FROM [reporting].[vinvoices] AS [vinvoices]\n  GROUP BY\n    MONTH([vinvoices].[invoicedate])\n)\nSELECT\n  [monthlyinvoicing].[invoicemonth] AS [invoicemonth],\n  [monthlyinvoicing].[totalinvoiced] AS [totalinvoiced],\n  LAG([monthlyinvoicing].[totalinvoiced]) OVER (ORDER BY [monthlyinvoicing].[invoicemonth]) AS [previoustotal],\n  CASE\n    WHEN LAG([monthlyinvoicing].[totalinvoiced]) OVER (ORDER BY [monthlyinvoicing].[invoicemonth]) IS NULL\n    THEN NULL\n    ELSE [monthlyinvoicing].[totalinvoiced] - LAG([monthlyinvoicing].[totalinvoiced]) OVER (ORDER BY [monthlyinvoicing].[invoicemonth])\n  END AS [change]\nFROM [monthlyinvoicing] AS [monthlyinvoicing]\nORDER BY\n  [invoicemonth]",
+      "result": {
+        "columns": [
+          "invoicemonth",
+          "totalinvoiced",
+          "previoustotal",
+          "change"
+        ],
+        "rows": [
+          [
+            1,
+            "204794.00",
+            null,
+            null
+          ],
+          [
+            2,
+            "250154.00",
+            "204794.00",
+            "45360.00"
+          ],
+          [
+            3,
+            "313666.00",
+            "250154.00",
+            "63512.00"
+          ],
+          [
+            4,
+            "385406.00",
+            "313666.00",
+            "71740.00"
+          ],
+          [
+            5,
+            "420386.00",
+            "385406.00",
+            "34980.00"
+          ],
+          [
+            6,
+            "488050.00",
+            "420386.00",
+            "67664.00"
+          ],
+          [
+            7,
+            "566018.00",
+            "488050.00",
+            "77968.00"
+          ],
+          [
+            8,
+            "590618.00",
+            "566018.00",
+            "24600.00"
+          ],
+          [
+            9,
+            "662434.00",
+            "590618.00",
+            "71816.00"
+          ],
+          [
+            10,
+            "746630.00",
+            "662434.00",
+            "84196.00"
+          ],
+          [
+            11,
+            "760850.00",
+            "746630.00",
+            "14220.00"
+          ],
+          [
+            12,
+            "836818.00",
+            "760850.00",
+            "75968.00"
+          ]
+        ],
+        "row_count": 12,
+        "elapsed_ms": 0,
+        "truncated": false
+      },
+      "explanation": "The query returned 12 rows with invoicemonth, totalinvoiced, previoustotal, change. The complete bounded result is shown below; financial amounts use CAD.",
+      "learning": {
+        "grain": "vInvoices: one row per invoice (many invoices per job)",
+        "concepts": [
+          "SELECT",
+          "Table grain",
+          "GROUP BY",
+          "CTE",
+          "Window function",
+          "Aggregation"
+        ],
+        "explanation": [
+          "Logical processing begins with FROM/JOIN, then WHERE, GROUP BY, HAVING, SELECT/window calculations, ORDER BY and TOP. The optimizer may execute differently.",
+          "GROUP BY produces one row per combination of grouping values.",
+          "A CTE names an intermediate query. It does not automatically materialize results or make a many-to-many join safe.",
+          "A window function computes across a partition while preserving rows. Include a deterministic ordering for rankings.",
+          "Aggregates operate at the input grain. Margin percentage is a ratio of totals, not an average of job percentages."
+        ],
+        "cautions": [
+          "Joining invoice and expense detail multiplies amounts; pre-aggregate each fact by JobId.",
+          "Budget variance = budget minus expenses; positive is favorable. Currency is CAD.",
+          "Avoid functions on indexed filter columns when a date range can express the filter.",
+          "Valid and authorized SQL can still answer the wrong business question; inspect grain and filters. Practice uses an independent reference, not the generated proposal."
+        ],
+        "exercise_id": null
+      },
+      "elapsed_seconds": 2.812
+    }
+  ],
+  "total_input_tokens": 7230,
+  "total_output_tokens": 389,
+  "security_grade": "separate mandatory pytest gate",
+  "release_validated": false,
+  "total": 5,
+  "passed": 4,
+  "failed": 1,
+  "failure_classes": {
+    "requested_sql_construct_missing": 1
+  },
+  "complete": true,
+  "completed_utc": "2026-10-08T16:18:06.116981+00:00"
+}

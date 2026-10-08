@@ -1,6 +1,5 @@
 """Streamlit has no SQL credentials or execution capability; all actions use the API."""
 
-import os
 from contextlib import suppress
 from typing import Any
 
@@ -8,24 +7,48 @@ import httpx
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
+from pydantic import ValidationError
+
+from frontend.access import FrontendSettings, SignInRequired, authorization_headers, clear_user_state
 
 load_dotenv()
 st.set_page_config(page_title="SQL Intelligence Agent", page_icon="🔎", layout="wide")
+try:
+    frontend_settings = FrontendSettings()
+except ValidationError:
+    st.error("Frontend authentication configuration is incomplete. Contact the application owner.")
+    st.stop()
+
+
+def sign_in_required(message: str) -> None:
+    clear_user_state(st.session_state)
+    st.session_state["_auth_failure"] = message
+    # A fresh render removes results/widgets already drawn before a late request failed.
+    st.rerun()
 
 
 def api(path: str, body: dict[str, Any] | None = None, method: str | None = None) -> dict[str, Any] | None:
-    token = os.environ.get("LOCAL_API_TOKEN", "")
-    # Cloud UI identity propagation is an M2 deployment gate; no shared cloud token fallback.
-    if os.environ.get("APP_ENV", "local") == "cloud":
-        st.error("Cloud UI requires the approved delegated Entra sign-in integration (M2).")
+    try:
+        headers = authorization_headers(
+            frontend_settings,
+            {name: st.context.headers.get_all(name) for name in st.context.headers}
+            if frontend_settings.app_env == "cloud"
+            else {},
+        )
+    except SignInRequired as exc:
+        sign_in_required(str(exc))
         return None
     try:
         with httpx.Client(
-            base_url=os.environ.get("API_URL", "http://127.0.0.1:8000"),
-            headers={"Authorization": f"Bearer {token}"},
+            base_url=frontend_settings.api_url,
+            headers=headers,
             timeout=65.0,
+            follow_redirects=False,
         ) as client:
             response = client.request(method or ("GET" if body is None else "POST"), path, json=body)
+        if response.status_code in {401, 403}:
+            sign_in_required("Your session expired or this account is not authorized. Sign in again.")
+            return None
         data = response.json()
         if response.is_error:
             st.error(data.get("detail", "The request could not be completed."))
@@ -44,6 +67,15 @@ def dataframe(result: dict[str, Any]) -> pd.DataFrame:
     return frame
 
 
+if "_auth_failure" in st.session_state:
+    st.error(st.session_state["_auth_failure"])
+    if frontend_settings.app_env == "cloud":
+        # Full navigation establishes a new authenticated websocket with a fresh access token.
+        st.markdown("[Sign in again](/.auth/login/aad?post_login_redirect_uri=/)")
+    else:
+        st.caption("Check local API authentication and reload the application.")
+    st.stop()
+
 st.caption("OPERATIONS INTELLIGENCE / SQL LEARNING LAB")
 st.title("Ask the data. Understand the SQL.")
 st.write("Explore synthetic operations data with validated T-SQL and a transparent path to every answer.")
@@ -55,6 +87,8 @@ if catalog is None:
 with st.sidebar:
     st.subheader("SQL Intelligence Agent")
     st.caption("Read-only • Synthetic data • CAD")
+    if frontend_settings.app_env == "cloud":
+        st.markdown("[Sign out of Microsoft Entra](/.auth/logout)")
     st.info(
         "Mock mode uses 27 reproducible questions."
         if catalog["mode"] == "mock"

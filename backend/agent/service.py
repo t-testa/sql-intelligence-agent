@@ -8,6 +8,8 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
+import sqlglot
+
 from backend.agent.conversation import ConversationStore, ConversationTurn
 from backend.agent.examples import BY_ID, EXAMPLES
 from backend.agent.learning import explain, grounded_answer
@@ -19,8 +21,8 @@ from backend.security.gateway import SQLGateway
 logger = logging.getLogger("sia.audit")
 
 
-def canonical_rows(result: ResultTable) -> Counter[tuple[str, ...]]:
-    """Compare unordered multisets, preserving duplicate rows and exact cent precision."""
+def canonical_sequence(result: ResultTable) -> list[tuple[str, ...]]:
+    """Preserve exact numeric values, NULLs, duplicates and sequence without rounding away errors."""
 
     def normalize(value: Any) -> str:
         if value is None:
@@ -28,12 +30,18 @@ def canonical_rows(result: ResultTable) -> Counter[tuple[str, ...]]:
         try:
             decimal = Decimal(str(value))
             if decimal.is_finite():
-                return "number:" + str(decimal.quantize(Decimal("0.01")))
+                # Decimal.normalize() uses context precision and can silently round DECIMAL(38).
+                exact = format(decimal, "f") if decimal else "0"
+                return "number:" + (exact.rstrip("0").rstrip(".") if "." in exact else exact)
         except InvalidOperation:
             pass
         return "text:" + str(value)
 
-    return Counter(tuple(normalize(value) for value in row) for row in result.rows)
+    return [tuple(normalize(value) for value in row) for row in result.rows]
+
+
+def canonical_rows(result: ResultTable) -> Counter[tuple[str, ...]]:
+    return Counter(canonical_sequence(result))
 
 
 class AgentService:
@@ -109,8 +117,11 @@ class AgentService:
         if canonical_rows(reference) != canonical_rows(expected):
             raise ValueError("Dataset differs from the independently verified practice fixture")
         candidate = self.backend.execute(candidate_query)
+        ordered = bool(sqlglot.parse_one(fixture["reference_sql"], read="tsql").args.get("order"))
         matches = len(candidate.columns) == len(expected.columns) and (
-            canonical_rows(candidate) == canonical_rows(expected)
+            canonical_sequence(candidate) == canonical_sequence(expected)
+            if ordered
+            else canonical_rows(candidate) == canonical_rows(expected)
         )
         return {
             "matches": matches,
@@ -120,6 +131,7 @@ class AgentService:
             "feedback": "Matches the independently verified result on this synthetic dataset."
             if matches
             else "Results differ. Check grouping, duplicate rows, filters and metric grain.",
-            "comparison": "Unordered row multiset; column positions matter; numbers compared to cents. "
+            "comparison": ("Ordered rows" if ordered else "Unordered row multiset")
+            + "; column positions and exact numeric values matter. "
             "Matching one fixture is not a proof of general query equivalence.",
         }

@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-08",
+  "runs": [
+    {
+      "recording": "initial",
+      "cases": 61,
+      "passed": 35,
+      "failed": 26,
+      "failure_rate_pct": 42.623,
+      "failures": {
+        "provider_failure": 23,
+        "policy_rejection": 3
+      },
+      "usage_from_receipts": {
+        "input": 39495,
+        "output": 1904,
+        "cached": 0,
+        "responses": 39,
+        "estimated_usd": 0.018844
+      }
+    },
+    {
+      "recording": "corrected-1",
+      "cases": 61,
+      "passed": 56,
+      "failed": 5,
+      "failure_rate_pct": 8.1967,
+      "failures": {
+        "provider_failure": 2,
+        "requested_sql_construct_missing": 1,
+        "values_precision_nulls_or_duplicates": 1,
+        "policy_rejection": 1
+      },
+      "usage_from_receipts": {
+        "input": 69951,
+        "output": 3548,
+        "cached": 59392,
+        "responses": 61,
+        "estimated_usd": 0.01584
+      }
+    },
+    {
+      "recording": "targeted-fixes",
+      "cases": 5,
+      "passed": 4,
+      "failed": 1,
+      "failure_rate_pct": 20.0,
+      "failures": {
+        "requested_sql_construct_missing": 1
+      },
+      "usage_from_receipts": {
+        "input": 7230,
+        "output": 389,
+        "cached": 5120,
+        "responses": 5,
+        "estimated_usd": 0.001978
+      }
+    },
+    {
+      "recording": "join-retest",
+      "cases": 1,
+      "passed": 1,
+      "failed": 0,
+      "failure_rate_pct": 0.0,
+      "failures": {},
+      "usage_from_receipts": {
+        "input": 1548,
+        "output": 70,
+        "cached": 0,
+        "responses": 1,
+        "estimated_usd": 0.000731
+      }
+    },
+    {
+      "recording": "candidate",
+      "cases": 61,
+      "passed": 60,
+      "failed": 1,
+      "failure_rate_pct": 1.6393,
+      "failures": {
+        "policy_rejection": 1
+      },
+      "usage_from_receipts": {
+        "input": 93985,
+        "output": 3409,
+        "cached": 86016,
+        "responses": 61,
+        "estimated_usd": 0.017244
+      }
+    },
+    {
+      "recording": "accepted",
+      "cases": 61,
+      "passed": 61,
+      "failed": 0,
+      "failure_rate_pct": 0.0,
+      "failures": {},
+      "usage_from_receipts": {
+        "input": 98682,
+        "output": 3367,
+        "cached": 89088,
+        "responses": 61,
+        "estimated_usd": 0.018134
+      }
+    }
+  ],
+  "regression": {
+    "windows": {
+      "tests": 367,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "security_folder_tests": 122,
+      "database_denial_tests": 6
+    },
+    "linux": {
+      "tests": 367,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "security_folder_tests": 122,
+      "database_denial_tests": 6
+    }
+  },
+  "estimated_recorded_inference_usd": 0.072771,
+  "pricing_note": "Receipt-based estimate, not actual Azure billing. Excludes API/UI smoke checks and infrastructure. Initial top-level token counters omitted one invalid contract response; this summary includes all receipt usage.",
+  "local_acceptance_passed": true,
+  "azure_hosting_validated": false,
+  "azure_resources_created": false,
+  "public_access_enabled": false,
+  "blockers": [
+    "Cloud frontend delegated Entra sign-in is not implemented; fails closed.",
+    "Real Azure SQL and Entra/managed-identity/network acceptance tests remain.",
+    "Deployment topology, monitoring alerts, resource choices and owner approvals remain."
+  ]
+}

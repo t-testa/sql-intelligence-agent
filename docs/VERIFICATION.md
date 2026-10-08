@@ -1,5 +1,9 @@
 # Final M1 verification — October 8, 2026
 
+Historical build evidence below is superseded for current release status by
+[October 8 live accuracy and release verification](RELEASE_VERIFICATION.md). Statements below about
+unconfigured Azure or no billable inference describe the earlier preparation stage only.
+
 ## Live-inference preparation follow-up
 
 The existing 218-test baseline was rerun unchanged before edits. After preparation, **275 tests pass**

@@ -6,9 +6,11 @@ M1 is a local, single-operator, synthetic-data application. It is not production
 
 1. Docker publishes SQL, FastAPI and Streamlit only on IPv4 loopback. A unique bearer token protects
    API operations. The local frontend represents the single trusted desktop operator.
-2. Cloud configuration rejects local authentication, SQL passwords/certificate bypass and Azure
-   OpenAI API keys. The API validates Entra RS256 signatures, issuer, audience, expiry, tenant,
-   explicit user object IDs and delegated scope. Client-supplied identity headers have no authority.
+2. Cloud configuration requires Entra authentication and SQL managed identity, and rejects certificate
+   bypass and Azure OpenAI API keys. The SQL identity adapter never uses a SQL password. The API validates
+   Entra RS256 signatures, issuer, audience, expiry, tenant,
+   explicit user object IDs and delegated scope. Cloud tokens also require version 2.0 and the approved
+   frontend client (`azp`). Duplicate bearer headers fail. Client-supplied identity headers have no authority.
 3. The model can call only `propose_query`; structured output is an input contract, not authorization.
 4. The gateway requires exactly one SELECT, an approved positive AST vocabulary, scoped column
    resolution, allowlisted views and a reviewed join. No DML, DDL, stored procedures, system tables,
@@ -31,6 +33,9 @@ M1 is a local, single-operator, synthetic-data application. It is not production
    supply arbitrary histories or roles. Accepted questions/proposals are retained in bounded process
    memory; result cells and rejected proposals are excluded. Expiry/capacity failures are explicit.
    Every proposal, including one generated from earlier context, still traverses the same gateway.
+10. Live inference has rolling request/token budgets and a daily attempt limit. Failures consume an
+    attempt; no SDK retries or silent mock fallback occur. These guards are per process, reset on restart,
+    and are not a persistent Azure cost cap. Pin one process/replica during the restricted pilot.
 
 ## Secrets and identities
 
@@ -54,6 +59,15 @@ SQL validation cannot prove business intent, inference resistance or arbitrary m
 An expensive allowed query can still consume resources before cancellation. Use database workload
 controls, distributed rate limits and operational monitoring before broader deployment.
 
-M2 requires live identity/network validation and a delegated cloud frontend. M4 requires row-level
+M2 requires actual tenant/platform/private-network validation of the implemented delegated frontend.
+The cloud frontend requires HTTPS, forwards only a delegated access token, never follows redirects
+with it, and clears displayed history/practice state on 401/403. It stores no token in session state.
+The API independently checks authorization for questions, validation, catalog, practice and conversation
+operations. The deployment access kill switch defaults off; cloud API docs/schema are disabled.
+Logout does not invalidate every previously issued JWT: revoke via API allowlist/kill switch, deactivate
+old revisions and verify denial. Private GitHub access is a separate permission boundary.
+See [private authentication](docs/PRIVATE_AUTH.md) and [release controls](docs/AZURE_RELEASE_PLAN.md).
+
+M4 requires row-level
 security, per-user data scopes, durable audit export, request budgets, security assessment, dependency
 auditing and incident procedures. See [THREAT_MODEL.md](THREAT_MODEL.md).

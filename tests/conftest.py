@@ -9,6 +9,19 @@ from backend.database.connection import make_engine
 from backend.database.executor import SQLServerBackend
 
 
+@pytest.fixture(autouse=True)
+def no_live_credentials_in_regressions(monkeypatch):
+    """Tests never inherit live inference credentials, even if local .env is configured."""
+    for key, value in {
+        "AGENT_MODE": "mock",
+        "AZURE_OPENAI_ENDPOINT": "",
+        "AZURE_OPENAI_DEPLOYMENT": "",
+        "AZURE_OPENAI_API_KEY": "",
+        "AZURE_OPENAI_MAX_OUTPUT_TOKENS": "4000",
+    }.items():
+        monkeypatch.setenv(key, value)
+
+
 @pytest.fixture(scope="session")
 def expected():
     return json.loads(Path("sql/seeds/expected_results.json").read_text(encoding="utf-8"))

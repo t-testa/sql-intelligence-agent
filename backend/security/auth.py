@@ -27,6 +27,10 @@ class Authenticator:
             )
 
     def authenticate(self, request: Request) -> Principal:
+        if not self.settings.application_access_enabled:
+            raise HTTPException(403, "Application access is disabled")
+        if len(request.headers.getlist("Authorization")) != 1:
+            raise HTTPException(401, "Exactly one bearer token is required")
         header = request.headers.get("Authorization", "")
         scheme, _, token = header.partition(" ")
         if scheme.lower() != "bearer" or not token or len(token) > 16384:
@@ -45,12 +49,21 @@ class Authenticator:
                 issuer=f"https://login.microsoftonline.com/{self.settings.entra_tenant_id}/v2.0",
                 options={"require": ["exp", "iat", "nbf", "aud", "iss", "oid", "tid"]},
             )
-        except jwt.PyJWTError as exc:
+        except (jwt.PyJWTError, ValueError, TypeError) as exc:
             raise HTTPException(401, "Invalid Entra access token") from exc
+        scope = claims.get("scp")
         if (
             claims["tid"] != self.settings.entra_tenant_id
             or claims["oid"] not in self.settings.entra_allowed_object_ids
-            or self.settings.entra_required_scope not in claims.get("scp", "").split()
+            or not isinstance(scope, str)
+            or self.settings.entra_required_scope not in scope.split()
+            or claims.get("idtyp") == "app"
+            or (
+                self.settings.app_env == "cloud"
+                and (
+                    claims.get("ver") != "2.0" or claims.get("azp") != self.settings.entra_frontend_client_id
+                )
+            )
         ):
             raise HTTPException(403, "User or delegated scope is not authorized")
         return Principal(str(claims["oid"]))

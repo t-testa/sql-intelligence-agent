@@ -1,0 +1,47 @@
+{
+  "deployment": "sql-agent-model",
+  "location": "canadaeast",
+  "model": {
+    "callRateLimit": null,
+    "format": "OpenAI",
+    "name": "gpt-4.1-mini",
+    "publisher": null,
+    "source": null,
+    "sourceAccount": null,
+    "version": "2025-04-14"
+  },
+  "sku": {
+    "capacity": 20,
+    "family": null,
+    "name": "GlobalStandard",
+    "size": null,
+    "tier": null
+  },
+  "provisioning_state": "Succeeded",
+  "rate_limits": [
+    {
+      "count": 20.0,
+      "dynamicThrottlingEnabled": null,
+      "key": "request",
+      "matchPatterns": null,
+      "minCount": null,
+      "renewalPeriod": 60.0
+    },
+    {
+      "count": 20000.0,
+      "dynamicThrottlingEnabled": null,
+      "key": "token",
+      "matchPatterns": null,
+      "minCount": null,
+      "renewalPeriod": 60.0
+    }
+  ],
+  "public_network_access": "Enabled",
+  "local_auth_disabled": null,
+  "resource_types_in_same_group": [
+    {
+      "location": "canadaeast",
+      "type": "Microsoft.CognitiveServices/accounts"
+    }
+  ]
+}
