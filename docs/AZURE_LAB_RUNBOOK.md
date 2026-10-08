@@ -1,5 +1,40 @@
 # Temporary private Azure deployment and teardown
 
+## PAUSED checkpoint — October 8, 2026
+
+**Deployment is paused at the owner's request. All earlier conditional deployment approvals are on
+hold until the owner explicitly resumes and approves the current plan.** The instructions below are
+reference material, not authorization to continue implementation, provision resources, run billable
+model calls or enable access.
+
+- **Source checkpoint:** before this documentation update, local `codex/m1-local-mvp`, `origin/main`
+  and the live private GitHub `main` all matched `68f42b7dec0bdba799efd070dfdfbd1176b87d5a`.
+  There were no uncommitted or unpushed changes. GitHub visibility was confirmed PRIVATE; Pages off.
+- **What works, last verified:** local Live/Mock operation, permanent SQL Learning Mode, SQL validation,
+  independent result verification and deterministic replay. Live, Mock and Stop shortcuts, `.env`,
+  private configuration and Docker database volumes remain preserved. No application or container
+  lifecycle changes are part of this checkpoint.
+- **Latest evidence, not rerun:** 467 Windows tests passed, including 220 security tests and six direct
+  SQL denials; Ruff/mypy passed; six Bicep templates compiled; final Azure what-if succeeded with 33
+  creations and no modifications/deletions. Earlier 61/61 live results used local SQL, not Azure SQL.
+  See [the dated preflight report](AZURE_PREFLIGHT_2026-10-08.md) and its evidence references.
+- **Existing Azure state, last inspected:** `sql-agent-openai-dev` / `sql-agent-model` remains in
+  `rg-sql-agent-dev`. Two owner-only Entra registrations/enterprise applications exist with sign-in
+  disabled and per-owner delegated consent; required providers are registered. No billable lab
+  infrastructure or application resource group was created. Private IDs and mutation records remain
+  in the ignored ledger. No Azure resources or identity settings were changed for this checkpoint.
+- **Remaining blockers:** the proposed private topology's $85–100/month estimate exceeds the earlier
+  $20–40 target; its temporary-lab cost/cleanup approval is on hold. The exact private callback awaits
+  the generated environment hostname. Real Entra login, private routing/DNS/TLS, managed identities,
+  Azure SQL permissions, cloud accuracy, monitoring and end-to-end acceptance remain unverified.
+- **Exact next step on resume:** review the dated preflight with the owner, refresh read-only identity,
+  resource, quota, pricing and what-if evidence, and obtain explicit approval of the current named
+  topology, spending/window, staged callback and cleanup choice. Only after explicit resumption and
+  that approval may the access-disabled foundation deployment begin. Do not infer approval from the
+  earlier pending request or from this runbook.
+
+This checkpoint changes documentation only; no new tests, model calls, cloud setup or SQL exercises.
+
 This is the reproducible execution plan, **not evidence of an Azure deployment**. The owner authorized
 the private deployment objective and routine identity preparation. The October 8
 [actual preflight and itemized proposal](AZURE_PREFLIGHT_2026-10-08.md) records completed checks and the
