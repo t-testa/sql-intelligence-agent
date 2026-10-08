@@ -1,0 +1,11 @@
+# Explicit opt-in. Default compose.yaml always keeps the application in mock mode.
+# Local API-key path: no administrator SQL password or Azure key reaches the frontend.
+services:
+  backend:
+    environment:
+      AGENT_MODE: azure
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT:?Set the approved Azure OpenAI endpoint in .env}
+      AZURE_OPENAI_DEPLOYMENT: ${AZURE_OPENAI_DEPLOYMENT:?Set the existing model deployment name in .env}
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:?Docker local live mode requires a resource API key}
+      AZURE_OPENAI_TIMEOUT_SECONDS: ${AZURE_OPENAI_TIMEOUT_SECONDS:-30}
+      AZURE_OPENAI_MAX_OUTPUT_TOKENS: ${AZURE_OPENAI_MAX_OUTPUT_TOKENS:-4000}

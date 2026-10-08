@@ -1,0 +1,11 @@
+// M3 reference definitions; create in the approved semantic model and verify against SQL fixtures.
+Total Contract Value = SUM ( FactJobFinancials[ContractValue] )
+Total Invoiced = SUM ( FactJobFinancials[TotalInvoiced] )
+Total Expenses = SUM ( FactJobFinancials[TotalExpenses] )
+Gross Margin = [Total Invoiced] - [Total Expenses]
+// Format as Percentage; DAX ratio 0.30 corresponds to SQL percentage-points value 30.00.
+Gross Margin Percentage = DIVIDE ( [Gross Margin], [Total Invoiced] )
+Job Count = COUNTROWS ( FactJobFinancials )
+Budget Variance = SUM ( FactJobFinancials[BudgetAmount] ) - [Total Expenses]
+Revenue Target = SUM ( Targets[RevenueTarget] )
+Invoiced vs Target = [Total Invoiced] - [Revenue Target]

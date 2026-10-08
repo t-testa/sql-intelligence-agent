@@ -1,0 +1,1369 @@
+{
+  "contract": {
+    "columns": [
+      "TotalContractValue"
+    ],
+    "rows": [
+      [
+        "7403160"
+      ]
+    ],
+    "reference_sql": "SELECT SUM(ContractValue) AS TotalContractValue FROM reporting.vJobs",
+    "privileged_sql": "SELECT SUM(ContractValue) AS TotalContractValue FROM ops.Jobs"
+  },
+  "invoiced": {
+    "columns": [
+      "TotalInvoiced"
+    ],
+    "rows": [
+      [
+        "6225824.00"
+      ]
+    ],
+    "reference_sql": "SELECT SUM(Amount) AS TotalInvoiced FROM reporting.vInvoices",
+    "privileged_sql": "SELECT SUM(Amount) AS TotalInvoiced FROM ops.Invoices"
+  },
+  "expenses": {
+    "columns": [
+      "TotalExpenses"
+    ],
+    "rows": [
+      [
+        "4523399.66"
+      ]
+    ],
+    "reference_sql": "SELECT SUM(Amount) AS TotalExpenses FROM reporting.vExpenses",
+    "privileged_sql": "SELECT SUM(Amount) AS TotalExpenses FROM ops.Expenses"
+  },
+  "margin": {
+    "columns": [
+      "GrossMargin"
+    ],
+    "rows": [
+      [
+        "1702424.34"
+      ]
+    ],
+    "reference_sql": "SELECT SUM(TotalInvoiced) - SUM(TotalExpenses) AS GrossMargin FROM reporting.vJobFinancials",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT SUM(TotalInvoiced) - SUM(TotalExpenses) AS GrossMargin FROM oracle"
+  },
+  "margin_pct": {
+    "columns": [
+      "GrossMarginPct"
+    ],
+    "rows": [
+      [
+        "27.34"
+      ]
+    ],
+    "reference_sql": "SELECT ROUND(100.0 * (SUM(TotalInvoiced) - SUM(TotalExpenses)) / NULLIF(SUM(TotalInvoiced),0), 2) AS GrossMarginPct FROM reporting.vJobFinancials",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT ROUND(100.0 * (SUM(TotalInvoiced) - SUM(TotalExpenses)) / NULLIF(SUM(TotalInvoiced),0), 2) AS GrossMarginPct FROM oracle"
+  },
+  "jobs": {
+    "columns": [
+      "JobCount"
+    ],
+    "rows": [
+      [
+        240
+      ]
+    ],
+    "reference_sql": "SELECT COUNT(JobId) AS JobCount FROM reporting.vJobs",
+    "privileged_sql": "SELECT COUNT(JobId) AS JobCount FROM ops.Jobs"
+  },
+  "budget": {
+    "columns": [
+      "BudgetVariance"
+    ],
+    "rows": [
+      [
+        "658812.34"
+      ]
+    ],
+    "reference_sql": "SELECT SUM(BudgetAmount) - SUM(TotalExpenses) AS BudgetVariance FROM reporting.vJobFinancials",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT SUM(BudgetAmount) - SUM(TotalExpenses) AS BudgetVariance FROM oracle"
+  },
+  "customers": {
+    "columns": [
+      "CustomerCount"
+    ],
+    "rows": [
+      [
+        60
+      ]
+    ],
+    "reference_sql": "SELECT COUNT(CustomerId) AS CustomerCount FROM reporting.vCustomers",
+    "privileged_sql": "SELECT COUNT(CustomerId) AS CustomerCount FROM ops.Customers"
+  },
+  "contract_region": {
+    "columns": [
+      "Region",
+      "TotalContractValue"
+    ],
+    "rows": [
+      [
+        "Central",
+        "1835220"
+      ],
+      [
+        "East",
+        "1845600"
+      ],
+      [
+        "North",
+        "1855980"
+      ],
+      [
+        "West",
+        "1866360"
+      ]
+    ],
+    "reference_sql": "SELECT Region, SUM(ContractValue) AS TotalContractValue FROM reporting.vJobFinancials GROUP BY Region ORDER BY Region",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT Region, SUM(ContractValue) AS TotalContractValue FROM oracle GROUP BY Region ORDER BY Region"
+  },
+  "invoiced_region": {
+    "columns": [
+      "Region",
+      "TotalInvoiced"
+    ],
+    "rows": [
+      [
+        "Central",
+        "1691724.00"
+      ],
+      [
+        "East",
+        "1697952.00"
+      ],
+      [
+        "North",
+        "1704180.00"
+      ],
+      [
+        "West",
+        "1131968.00"
+      ]
+    ],
+    "reference_sql": "SELECT Region, SUM(TotalInvoiced) AS TotalInvoiced FROM reporting.vJobFinancials GROUP BY Region ORDER BY Region",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT Region, SUM(TotalInvoiced) AS TotalInvoiced FROM oracle GROUP BY Region ORDER BY Region"
+  },
+  "expenses_region": {
+    "columns": [
+      "Region",
+      "TotalExpenses"
+    ],
+    "rows": [
+      [
+        "Central",
+        "1214915.64"
+      ],
+      [
+        "East",
+        "1231411.68"
+      ],
+      [
+        "North",
+        "1235335.32"
+      ],
+      [
+        "West",
+        "841737.02"
+      ]
+    ],
+    "reference_sql": "SELECT Region, SUM(TotalExpenses) AS TotalExpenses FROM reporting.vJobFinancials GROUP BY Region ORDER BY Region",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT Region, SUM(TotalExpenses) AS TotalExpenses FROM oracle GROUP BY Region ORDER BY Region"
+  },
+  "margin_region": {
+    "columns": [
+      "Region",
+      "GrossMargin"
+    ],
+    "rows": [
+      [
+        "Central",
+        "476808.36"
+      ],
+      [
+        "East",
+        "466540.32"
+      ],
+      [
+        "North",
+        "468844.68"
+      ],
+      [
+        "West",
+        "290230.98"
+      ]
+    ],
+    "reference_sql": "SELECT Region, SUM(TotalInvoiced) - SUM(TotalExpenses) AS GrossMargin FROM reporting.vJobFinancials GROUP BY Region ORDER BY Region",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT Region, SUM(TotalInvoiced) - SUM(TotalExpenses) AS GrossMargin FROM oracle GROUP BY Region ORDER BY Region"
+  },
+  "jobs_region": {
+    "columns": [
+      "Region",
+      "JobCount"
+    ],
+    "rows": [
+      [
+        "Central",
+        "60"
+      ],
+      [
+        "East",
+        "60"
+      ],
+      [
+        "North",
+        "60"
+      ],
+      [
+        "West",
+        "60"
+      ]
+    ],
+    "reference_sql": "SELECT Region, COUNT(JobId) AS JobCount FROM reporting.vJobFinancials GROUP BY Region ORDER BY Region",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT Region, COUNT(JobId) AS JobCount FROM oracle GROUP BY Region ORDER BY Region"
+  },
+  "contract_status": {
+    "columns": [
+      "Status",
+      "TotalContractValue"
+    ],
+    "rows": [
+      [
+        "Active",
+        "1353440"
+      ],
+      [
+        "Completed",
+        "5413760"
+      ],
+      [
+        "Planned",
+        "635960"
+      ]
+    ],
+    "reference_sql": "SELECT Status, SUM(ContractValue) AS TotalContractValue FROM reporting.vJobs GROUP BY Status ORDER BY Status",
+    "privileged_sql": "SELECT Status, SUM(ContractValue) AS TotalContractValue FROM ops.Jobs GROUP BY Status ORDER BY Status"
+  },
+  "expense_category": {
+    "columns": [
+      "Category",
+      "TotalExpenses"
+    ],
+    "rows": [
+      [
+        "Labor",
+        "2119709.71"
+      ],
+      [
+        "Materials",
+        "1779759.81"
+      ],
+      [
+        "Travel",
+        "623930.14"
+      ]
+    ],
+    "reference_sql": "SELECT Category, SUM(Amount) AS TotalExpenses FROM reporting.vExpenses GROUP BY Category ORDER BY Category",
+    "privileged_sql": "SELECT Category, SUM(Amount) AS TotalExpenses FROM ops.Expenses GROUP BY Category ORDER BY Category"
+  },
+  "invoices_count": {
+    "columns": [
+      "InvoiceCount"
+    ],
+    "rows": [
+      [
+        480
+      ]
+    ],
+    "reference_sql": "SELECT COUNT(InvoiceId) AS InvoiceCount FROM reporting.vInvoices",
+    "privileged_sql": "SELECT COUNT(InvoiceId) AS InvoiceCount FROM ops.Invoices"
+  },
+  "expenses_count": {
+    "columns": [
+      "ExpenseCount"
+    ],
+    "rows": [
+      [
+        720
+      ]
+    ],
+    "reference_sql": "SELECT COUNT(ExpenseId) AS ExpenseCount FROM reporting.vExpenses",
+    "privileged_sql": "SELECT COUNT(ExpenseId) AS ExpenseCount FROM ops.Expenses"
+  },
+  "north_contract": {
+    "columns": [
+      "TotalContractValue"
+    ],
+    "rows": [
+      [
+        "1855980"
+      ]
+    ],
+    "reference_sql": "SELECT SUM(ContractValue) AS TotalContractValue FROM reporting.vJobFinancials WHERE Region = 'North'",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT SUM(ContractValue) AS TotalContractValue FROM oracle WHERE Region = 'North'"
+  },
+  "completed": {
+    "columns": [
+      "JobCount"
+    ],
+    "rows": [
+      [
+        176
+      ]
+    ],
+    "reference_sql": "SELECT COUNT(JobId) AS JobCount FROM reporting.vJobs WHERE Status = 'Completed'",
+    "privileged_sql": "SELECT COUNT(JobId) AS JobCount FROM ops.Jobs WHERE Status = 'Completed'"
+  },
+  "over_budget": {
+    "columns": [
+      "JobId",
+      "BudgetVariance"
+    ],
+    "rows": [
+      [
+        7,
+        "-1905.87"
+      ],
+      [
+        14,
+        "-2111.74"
+      ],
+      [
+        21,
+        "-2317.61"
+      ],
+      [
+        28,
+        "-2523.48"
+      ],
+      [
+        35,
+        "-2729.35"
+      ],
+      [
+        42,
+        "-2935.22"
+      ],
+      [
+        49,
+        "-3141.09"
+      ],
+      [
+        56,
+        "-3346.96"
+      ],
+      [
+        63,
+        "-3552.83"
+      ],
+      [
+        70,
+        "-3758.70"
+      ],
+      [
+        77,
+        "-3964.57"
+      ],
+      [
+        91,
+        "-4376.31"
+      ],
+      [
+        98,
+        "-4582.18"
+      ],
+      [
+        105,
+        "-4788.05"
+      ],
+      [
+        112,
+        "-4993.92"
+      ],
+      [
+        119,
+        "-5199.79"
+      ],
+      [
+        126,
+        "-5405.66"
+      ],
+      [
+        133,
+        "-5611.53"
+      ],
+      [
+        140,
+        "-5817.40"
+      ],
+      [
+        147,
+        "-6023.27"
+      ],
+      [
+        154,
+        "-6229.14"
+      ],
+      [
+        161,
+        "-6435.01"
+      ],
+      [
+        175,
+        "-6846.75"
+      ],
+      [
+        182,
+        "-7052.62"
+      ],
+      [
+        189,
+        "-7258.49"
+      ],
+      [
+        196,
+        "-7464.36"
+      ],
+      [
+        203,
+        "-7670.23"
+      ],
+      [
+        210,
+        "-7876.10"
+      ],
+      [
+        217,
+        "-8081.97"
+      ],
+      [
+        224,
+        "-8287.84"
+      ],
+      [
+        231,
+        "-8493.71"
+      ],
+      [
+        238,
+        "-8699.58"
+      ]
+    ],
+    "reference_sql": "SELECT JobId, BudgetAmount - TotalExpenses AS BudgetVariance FROM reporting.vJobFinancials WHERE TotalExpenses > BudgetAmount ORDER BY JobId",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT JobId, BudgetAmount - TotalExpenses AS BudgetVariance FROM oracle WHERE TotalExpenses > BudgetAmount ORDER BY JobId"
+  },
+  "top_customers": {
+    "columns": [
+      "CustomerName",
+      "TotalInvoiced"
+    ],
+    "rows": [
+      [
+        "Synthetic Customer 059",
+        "143108.00"
+      ],
+      [
+        "Synthetic Customer 058",
+        "142416.00"
+      ],
+      [
+        "Synthetic Customer 057",
+        "141724.00"
+      ],
+      [
+        "Synthetic Customer 056",
+        "141032.00"
+      ],
+      [
+        "Synthetic Customer 054",
+        "139648.00"
+      ]
+    ],
+    "reference_sql": "SELECT TOP 5 CustomerName, SUM(TotalInvoiced) AS TotalInvoiced FROM reporting.vJobFinancials GROUP BY CustomerName ORDER BY TotalInvoiced DESC, CustomerName",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT TOP 5 CustomerName, SUM(TotalInvoiced) AS TotalInvoiced FROM oracle GROUP BY CustomerName ORDER BY TotalInvoiced DESC, CustomerName"
+  },
+  "monthly_invoiced": {
+    "columns": [
+      "InvoiceMonth",
+      "TotalInvoiced"
+    ],
+    "rows": [
+      [
+        1,
+        "204794.00"
+      ],
+      [
+        2,
+        "250154.00"
+      ],
+      [
+        3,
+        "313666.00"
+      ],
+      [
+        4,
+        "385406.00"
+      ],
+      [
+        5,
+        "420386.00"
+      ],
+      [
+        6,
+        "488050.00"
+      ],
+      [
+        7,
+        "566018.00"
+      ],
+      [
+        8,
+        "590618.00"
+      ],
+      [
+        9,
+        "662434.00"
+      ],
+      [
+        10,
+        "746630.00"
+      ],
+      [
+        11,
+        "760850.00"
+      ],
+      [
+        12,
+        "836818.00"
+      ]
+    ],
+    "reference_sql": "SELECT MONTH(InvoiceDate) AS InvoiceMonth, SUM(Amount) AS TotalInvoiced FROM reporting.vInvoices GROUP BY MONTH(InvoiceDate) ORDER BY InvoiceMonth",
+    "privileged_sql": "SELECT MONTH(InvoiceDate) AS InvoiceMonth, SUM(Amount) AS TotalInvoiced FROM ops.Invoices GROUP BY MONTH(InvoiceDate) ORDER BY InvoiceMonth"
+  },
+  "target_region": {
+    "columns": [
+      "Region",
+      "RevenueTarget"
+    ],
+    "rows": [
+      [
+        "Central",
+        "1590000"
+      ],
+      [
+        "East",
+        "1614000"
+      ],
+      [
+        "North",
+        "1638000"
+      ],
+      [
+        "West",
+        "1662000"
+      ]
+    ],
+    "reference_sql": "SELECT Region, SUM(RevenueTarget) AS RevenueTarget FROM reporting.vTargets GROUP BY Region ORDER BY Region",
+    "privileged_sql": "SELECT Region, SUM(RevenueTarget) AS RevenueTarget FROM ops.Targets GROUP BY Region ORDER BY Region"
+  },
+  "margin_pct_region": {
+    "columns": [
+      "Region",
+      "GrossMarginPct"
+    ],
+    "rows": [
+      [
+        "Central",
+        "28.18"
+      ],
+      [
+        "East",
+        "27.48"
+      ],
+      [
+        "North",
+        "27.51"
+      ],
+      [
+        "West",
+        "25.64"
+      ]
+    ],
+    "reference_sql": "SELECT Region, ROUND(100.0 * (SUM(TotalInvoiced) - SUM(TotalExpenses)) / NULLIF(SUM(TotalInvoiced),0), 2) AS GrossMarginPct FROM reporting.vJobFinancials GROUP BY Region ORDER BY Region",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT Region, ROUND(100.0 * (SUM(TotalInvoiced) - SUM(TotalExpenses)) / NULLIF(SUM(TotalInvoiced),0), 2) AS GrossMarginPct FROM oracle GROUP BY Region ORDER BY Region"
+  },
+  "above_average": {
+    "columns": [
+      "JobId",
+      "ContractValue"
+    ],
+    "rows": [
+      [
+        121,
+        "30933"
+      ],
+      [
+        122,
+        "31106"
+      ],
+      [
+        123,
+        "31279"
+      ],
+      [
+        124,
+        "31452"
+      ],
+      [
+        125,
+        "31625"
+      ],
+      [
+        126,
+        "31798"
+      ],
+      [
+        127,
+        "31971"
+      ],
+      [
+        128,
+        "32144"
+      ],
+      [
+        129,
+        "32317"
+      ],
+      [
+        130,
+        "32490"
+      ],
+      [
+        131,
+        "32663"
+      ],
+      [
+        132,
+        "32836"
+      ],
+      [
+        133,
+        "33009"
+      ],
+      [
+        134,
+        "33182"
+      ],
+      [
+        135,
+        "33355"
+      ],
+      [
+        136,
+        "33528"
+      ],
+      [
+        137,
+        "33701"
+      ],
+      [
+        138,
+        "33874"
+      ],
+      [
+        139,
+        "34047"
+      ],
+      [
+        140,
+        "34220"
+      ],
+      [
+        141,
+        "34393"
+      ],
+      [
+        142,
+        "34566"
+      ],
+      [
+        143,
+        "34739"
+      ],
+      [
+        144,
+        "34912"
+      ],
+      [
+        145,
+        "35085"
+      ],
+      [
+        146,
+        "35258"
+      ],
+      [
+        147,
+        "35431"
+      ],
+      [
+        148,
+        "35604"
+      ],
+      [
+        149,
+        "35777"
+      ],
+      [
+        150,
+        "35950"
+      ],
+      [
+        151,
+        "36123"
+      ],
+      [
+        152,
+        "36296"
+      ],
+      [
+        153,
+        "36469"
+      ],
+      [
+        154,
+        "36642"
+      ],
+      [
+        155,
+        "36815"
+      ],
+      [
+        156,
+        "36988"
+      ],
+      [
+        157,
+        "37161"
+      ],
+      [
+        158,
+        "37334"
+      ],
+      [
+        159,
+        "37507"
+      ],
+      [
+        160,
+        "37680"
+      ],
+      [
+        161,
+        "37853"
+      ],
+      [
+        162,
+        "38026"
+      ],
+      [
+        163,
+        "38199"
+      ],
+      [
+        164,
+        "38372"
+      ],
+      [
+        165,
+        "38545"
+      ],
+      [
+        166,
+        "38718"
+      ],
+      [
+        167,
+        "38891"
+      ],
+      [
+        168,
+        "39064"
+      ],
+      [
+        169,
+        "39237"
+      ],
+      [
+        170,
+        "39410"
+      ],
+      [
+        171,
+        "39583"
+      ],
+      [
+        172,
+        "39756"
+      ],
+      [
+        173,
+        "39929"
+      ],
+      [
+        174,
+        "40102"
+      ],
+      [
+        175,
+        "40275"
+      ],
+      [
+        176,
+        "40448"
+      ],
+      [
+        177,
+        "40621"
+      ],
+      [
+        178,
+        "40794"
+      ],
+      [
+        179,
+        "40967"
+      ],
+      [
+        180,
+        "41140"
+      ],
+      [
+        181,
+        "41313"
+      ],
+      [
+        182,
+        "41486"
+      ],
+      [
+        183,
+        "41659"
+      ],
+      [
+        184,
+        "41832"
+      ],
+      [
+        185,
+        "42005"
+      ],
+      [
+        186,
+        "42178"
+      ],
+      [
+        187,
+        "42351"
+      ],
+      [
+        188,
+        "42524"
+      ],
+      [
+        189,
+        "42697"
+      ],
+      [
+        190,
+        "42870"
+      ],
+      [
+        191,
+        "43043"
+      ],
+      [
+        192,
+        "43216"
+      ],
+      [
+        193,
+        "43389"
+      ],
+      [
+        194,
+        "43562"
+      ],
+      [
+        195,
+        "43735"
+      ],
+      [
+        196,
+        "43908"
+      ],
+      [
+        197,
+        "44081"
+      ],
+      [
+        198,
+        "44254"
+      ],
+      [
+        199,
+        "44427"
+      ],
+      [
+        200,
+        "44600"
+      ],
+      [
+        201,
+        "44773"
+      ],
+      [
+        202,
+        "44946"
+      ],
+      [
+        203,
+        "45119"
+      ],
+      [
+        204,
+        "45292"
+      ],
+      [
+        205,
+        "45465"
+      ],
+      [
+        206,
+        "45638"
+      ],
+      [
+        207,
+        "45811"
+      ],
+      [
+        208,
+        "45984"
+      ],
+      [
+        209,
+        "46157"
+      ],
+      [
+        210,
+        "46330"
+      ],
+      [
+        211,
+        "46503"
+      ],
+      [
+        212,
+        "46676"
+      ],
+      [
+        213,
+        "46849"
+      ],
+      [
+        214,
+        "47022"
+      ],
+      [
+        215,
+        "47195"
+      ],
+      [
+        216,
+        "47368"
+      ],
+      [
+        217,
+        "47541"
+      ],
+      [
+        218,
+        "47714"
+      ],
+      [
+        219,
+        "47887"
+      ],
+      [
+        220,
+        "48060"
+      ],
+      [
+        221,
+        "48233"
+      ],
+      [
+        222,
+        "48406"
+      ],
+      [
+        223,
+        "48579"
+      ],
+      [
+        224,
+        "48752"
+      ],
+      [
+        225,
+        "48925"
+      ],
+      [
+        226,
+        "49098"
+      ],
+      [
+        227,
+        "49271"
+      ],
+      [
+        228,
+        "49444"
+      ],
+      [
+        229,
+        "49617"
+      ],
+      [
+        230,
+        "49790"
+      ],
+      [
+        231,
+        "49963"
+      ],
+      [
+        232,
+        "50136"
+      ],
+      [
+        233,
+        "50309"
+      ],
+      [
+        234,
+        "50482"
+      ],
+      [
+        235,
+        "50655"
+      ],
+      [
+        236,
+        "50828"
+      ],
+      [
+        237,
+        "51001"
+      ],
+      [
+        238,
+        "51174"
+      ],
+      [
+        239,
+        "51347"
+      ],
+      [
+        240,
+        "51520"
+      ]
+    ],
+    "reference_sql": "SELECT JobId, ContractValue FROM reporting.vJobs WHERE ContractValue > (SELECT SUM(ContractValue) / COUNT(JobId) FROM reporting.vJobs) ORDER BY JobId",
+    "privileged_sql": "SELECT JobId, ContractValue FROM ops.Jobs WHERE ContractValue > (SELECT SUM(ContractValue) / COUNT(JobId) FROM ops.Jobs) ORDER BY JobId"
+  },
+  "rank_regions": {
+    "columns": [
+      "Region",
+      "TotalContractValue",
+      "RegionRank"
+    ],
+    "rows": [
+      [
+        "West",
+        "1866360",
+        1
+      ],
+      [
+        "North",
+        "1855980",
+        2
+      ],
+      [
+        "East",
+        "1845600",
+        3
+      ],
+      [
+        "Central",
+        "1835220",
+        4
+      ]
+    ],
+    "reference_sql": "SELECT Region, SUM(ContractValue) AS TotalContractValue, ROW_NUMBER() OVER (ORDER BY SUM(ContractValue) DESC, Region) AS RegionRank FROM reporting.vJobFinancials GROUP BY Region ORDER BY RegionRank",
+    "privileged_sql": "WITH oracle AS (\nSELECT j.JobId, j.CustomerId, c.CustomerName, c.Region, c.Segment,\n       j.StartDate, j.Status, j.ContractValue, j.BudgetAmount,\n       (SELECT SUM(i.Amount) FROM ops.Invoices i WHERE i.JobId=j.JobId) AS TotalInvoiced,\n       (SELECT SUM(e.Amount) FROM ops.Expenses e WHERE e.JobId=j.JobId) AS TotalExpenses\nFROM ops.Jobs j INNER JOIN ops.Customers c ON c.CustomerId=j.CustomerId\n)\nSELECT Region, SUM(ContractValue) AS TotalContractValue, ROW_NUMBER() OVER (ORDER BY SUM(ContractValue) DESC, Region) AS RegionRank FROM oracle GROUP BY Region ORDER BY RegionRank"
+  },
+  "having": {
+    "columns": [
+      "CustomerId",
+      "JobCount"
+    ],
+    "rows": [
+      [
+        1,
+        "4"
+      ],
+      [
+        2,
+        "4"
+      ],
+      [
+        3,
+        "4"
+      ],
+      [
+        4,
+        "4"
+      ],
+      [
+        5,
+        "4"
+      ],
+      [
+        6,
+        "4"
+      ],
+      [
+        7,
+        "4"
+      ],
+      [
+        8,
+        "4"
+      ],
+      [
+        9,
+        "4"
+      ],
+      [
+        10,
+        "4"
+      ],
+      [
+        11,
+        "4"
+      ],
+      [
+        12,
+        "4"
+      ],
+      [
+        13,
+        "4"
+      ],
+      [
+        14,
+        "4"
+      ],
+      [
+        15,
+        "4"
+      ],
+      [
+        16,
+        "4"
+      ],
+      [
+        17,
+        "4"
+      ],
+      [
+        18,
+        "4"
+      ],
+      [
+        19,
+        "4"
+      ],
+      [
+        20,
+        "4"
+      ],
+      [
+        21,
+        "4"
+      ],
+      [
+        22,
+        "4"
+      ],
+      [
+        23,
+        "4"
+      ],
+      [
+        24,
+        "4"
+      ],
+      [
+        25,
+        "4"
+      ],
+      [
+        26,
+        "4"
+      ],
+      [
+        27,
+        "4"
+      ],
+      [
+        28,
+        "4"
+      ],
+      [
+        29,
+        "4"
+      ],
+      [
+        30,
+        "4"
+      ],
+      [
+        31,
+        "4"
+      ],
+      [
+        32,
+        "4"
+      ],
+      [
+        33,
+        "4"
+      ],
+      [
+        34,
+        "4"
+      ],
+      [
+        35,
+        "4"
+      ],
+      [
+        36,
+        "4"
+      ],
+      [
+        37,
+        "4"
+      ],
+      [
+        38,
+        "4"
+      ],
+      [
+        39,
+        "4"
+      ],
+      [
+        40,
+        "4"
+      ],
+      [
+        41,
+        "4"
+      ],
+      [
+        42,
+        "4"
+      ],
+      [
+        43,
+        "4"
+      ],
+      [
+        44,
+        "4"
+      ],
+      [
+        45,
+        "4"
+      ],
+      [
+        46,
+        "4"
+      ],
+      [
+        47,
+        "4"
+      ],
+      [
+        48,
+        "4"
+      ],
+      [
+        49,
+        "4"
+      ],
+      [
+        50,
+        "4"
+      ],
+      [
+        51,
+        "4"
+      ],
+      [
+        52,
+        "4"
+      ],
+      [
+        53,
+        "4"
+      ],
+      [
+        54,
+        "4"
+      ],
+      [
+        55,
+        "4"
+      ],
+      [
+        56,
+        "4"
+      ],
+      [
+        57,
+        "4"
+      ],
+      [
+        58,
+        "4"
+      ],
+      [
+        59,
+        "4"
+      ],
+      [
+        60,
+        "4"
+      ]
+    ],
+    "reference_sql": "SELECT CustomerId, COUNT(JobId) AS JobCount FROM reporting.vJobs GROUP BY CustomerId HAVING COUNT(JobId) >= 4 ORDER BY CustomerId",
+    "privileged_sql": "SELECT CustomerId, COUNT(JobId) AS JobCount FROM ops.Jobs GROUP BY CustomerId HAVING COUNT(JobId) >= 4 ORDER BY CustomerId"
+  }
+}

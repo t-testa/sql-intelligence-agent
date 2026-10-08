@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sql-intelligence-agent"
+version = "0.1.0"
+description = "A bounded, explainable, read-only T-SQL learning agent"
+requires-python = ">=3.10,<3.13"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.in"]}
+
+[tool.setuptools.packages.find]
+include = ["backend*", "frontend*", "scripts*"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires isolated SQL Server with seeded synthetic database"]
+addopts = "-ra"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+files = ["backend", "scripts"]
+
+[[tool.mypy.overrides]]
+module = ["sqlglot.*", "pyodbc.*"]
+follow_imports = "skip"
