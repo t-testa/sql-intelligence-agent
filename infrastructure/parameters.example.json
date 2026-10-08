@@ -4,8 +4,11 @@
   "parameters": {
     "location": { "value": "canadaeast" },
     "prefix": { "value": "sqlintel" },
-    "sqlAdminObjectId": { "value": "REPLACE-WITH-APPROVED-GROUP-OBJECT-ID" },
-    "sqlAdminDisplayName": { "value": "REPLACE-WITH-APPROVED-GROUP-NAME" },
+    "sqlAdminObjectId": { "value": "REPLACE-WITH-APPROVED-MIGRATION-USER-OBJECT-ID" },
+    "sqlAdminDisplayName": { "value": "REPLACE-WITH-APPROVED-MIGRATION-USER-NAME" },
+    "sqlAdminPrincipalType": { "value": "User" },
+    "entraTenantId": { "value": "REPLACE-WITH-APPROVED-TENANT-ID" },
+    "createValidationDatabase": { "value": true },
     "existingOpenaiName": { "value": "REPLACE-WITH-EXISTING-APPROVED-RESOURCE" },
     "existingOpenaiResourceGroup": { "value": "REPLACE-WITH-EXISTING-RESOURCE-GROUP" },
     "migrationSubnetPrefix": { "value": "" }

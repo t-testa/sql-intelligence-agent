@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": { "value": "FOUNDATION-OUTPUT" },
+    "frontendIdentityName": { "value": "FOUNDATION-OUTPUT" },
+    "image": { "value": "REGISTRY/sql-intelligence-agent@sha256:APPROVED-DIGEST" },
+    "registryServer": { "value": "FOUNDATION-OUTPUT" },
+    "apiFqdn": { "value": "API-DEPLOYMENT-OUTPUT" },
+    "apiClientId": { "value": "APPROVED-API-CLIENT-ID" },
+    "frontendClientId": { "value": "APPROVED-FRONTEND-CLIENT-ID" },
+    "approvedUserObjectId": { "value": "SOLE-APPROVED-OWNER-OBJECT-ID" },
+    "entraTenantId": { "value": "APPROVED-TENANT-ID" },
+    "frontendClientSecret": { "value": "" },
+    "tokenStoreSasUrl": { "value": "" }
+  }
+}

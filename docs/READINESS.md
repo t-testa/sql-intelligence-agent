@@ -1,5 +1,9 @@
 # Milestones and production-readiness gaps
 
+The two-mode [portability report](PORTABILITY_VERIFICATION.md) records verified Windows/WSL local
+operation and 466 passing tests on each platform. Private Azure remains unprovisioned; follow the
+[temporary Azure lifecycle runbook](AZURE_LAB_RUNBOOK.md) for remaining gates and cleanup.
+
 | Milestone | Implemented/prepared | Remaining |
 |---|---|---|
 | M1 | Five tables, deterministic seed, views, runtime DENY, FastAPI, live Responses adapter/mock, SQL policy, Streamlit, permanent lessons/practice, recorded live corpus, tests and CI | Finite measured corpus, no universal correctness claim; see release verification |

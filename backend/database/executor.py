@@ -1,6 +1,8 @@
 import json
+import sys
 import threading
 import time
+from contextlib import suppress
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Protocol
@@ -113,18 +115,33 @@ class SQLServerBackend:
                 raise QueryTimeoutError("Query exceeded the database execution deadline") from exc
             raise ExecutionError("Database query failed; check the SQL and service health") from exc
         finally:
+            failed = sys.exc_info()[0] is not None
+            cleanup_failed = False
             try:
                 if cursor is not None:
-                    cursor.close()
+                    try:
+                        cursor.close()
+                    except (pyodbc.Error, SQLAlchemyError):
+                        cleanup_failed = True
+                if connection is not None:
+                    try:
+                        connection.rollback()
+                    except (pyodbc.Error, SQLAlchemyError):
+                        cleanup_failed = True
+                    if cleanup_failed:
+                        # A failed cancellation/rollback must not return a broken connection to the pool.
+                        with suppress(pyodbc.Error, SQLAlchemyError):
+                            connection.invalidate()
+                    try:
+                        connection.close()
+                    except (pyodbc.Error, SQLAlchemyError):
+                        cleanup_failed = True
             finally:
-                try:
-                    if connection is not None:
-                        try:
-                            connection.rollback()
-                        finally:
-                            connection.close()
-                finally:
-                    self._slots.release()
+                self._slots.release()
+            if cleanup_failed and not failed:
+                raise ExecutionError(
+                    "Database connection cleanup failed; retry after checking service health"
+                )
 
 
 class FabricSQLBackend:

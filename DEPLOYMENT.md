@@ -1,5 +1,27 @@
 # Deployment and operations
 
+## Two supported operating modes
+
+The **temporary private Azure lab** provides real Entra, managed identity, private networking, Azure
+SQL and monitoring experience. It is verified only after actual cloud acceptance. The **local portable
+deployment** runs the same application in Docker Desktop/Ubuntu WSL, using local SQL Server and the
+existing Azure OpenAI deployment. It remains usable after deletion of the dedicated Azure application
+group. SQL Learning Mode, mock mode, independent references and deterministic replay remain permanent.
+
+- [Local launch, stop, replay and Windows desktop shortcuts](docs/LOCAL_PORTABLE.md)
+- [Azure provisioning, acceptance, evidence, rollback, cleanup and redeployment](docs/AZURE_LAB_RUNBOOK.md)
+- [Dated verification of both modes](docs/PORTABILITY_VERIFICATION.md)
+
+```powershell
+.\local.cmd start --mode live --open-browser
+.\local.cmd stop
+.\local.cmd test
+```
+
+Ubuntu WSL uses `bash ./local.sh` with the same arguments. Start submits no inference request; questions
+in live mode are billable. The reused model stays outside the temporary application group, with an
+independent approved local access path. New Azure provisioning/deletion still needs explicit approval.
+
 The full source repository is private. Azure uses an internal Container Apps environment, owner-only
 Entra sign-in, independent FastAPI authorization and private SQL. The controlling documents are the
 [private release plan](docs/AZURE_RELEASE_PLAN.md), [identity runbook](docs/PRIVATE_AUTH.md) and
@@ -18,6 +40,7 @@ inference; preserve mock mode for free regressions. Future private OpenAI cutove
 docker compose --profile test run --build --rm tests
 # Compilation only, not deployment.
 az bicep build --file infrastructure/main.bicep --outfile artifacts/private-main.json
+az bicep build --file infrastructure/private_dns.bicep --outfile artifacts/private-dns.json
 az bicep build --file infrastructure/application.bicep --outfile artifacts/private-api.json
 az bicep build --file infrastructure/frontend.bicep --outfile artifacts/private-frontend.json
 # Missing approved identity configuration returns nonzero.

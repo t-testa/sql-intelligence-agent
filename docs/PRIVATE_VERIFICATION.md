@@ -1,5 +1,9 @@
 # Private deployment verification — October 8, 2026
 
+Later update: [portable deployment verification](PORTABILITY_VERIFICATION.md) records the new
+Windows/WSL launchers, 466 passing tests per platform and the temporary Azure lifecycle plan.
+The historical results below remain the earlier private-access baseline.
+
 **Local changes validated. Not yet ready to request Azure provisioning approval.**
 The full source is subject to the PRIVATE-only policy. The owner subsequently supplied
 `https://github.com/t-testa/sql-intelligence-agent` and authorized a push after the source/history audit.

@@ -6,12 +6,20 @@ No template has been applied. Follow the [private plan](../docs/AZURE_RELEASE_PL
 - `main.bicep`: internal ACA/public network disabled; private SQL Basic, endpoint NSG/DNS, separate
   API/frontend MI, authenticated ACR Basic, private token storage, logs and insights. Reuses OpenAI;
   creates no new model/account or role assignments.
+- `private_dns.bicep`: second stage using the foundation's generated environment domain/private IP;
+  creates private wildcard/apex DNS and the application VNet link. Owner route/forwarding remains explicit.
 - `application.bicep`: private Entra API, runtime MI, strict inference limits, one replica and API
   access **disabled by default**. Initially accepts exactly one approved user object ID.
 - `frontend.bicep`: private-network Streamlit, owner-only Easy Auth and delegated API scope/token store.
   Must target the verified internal environment. Its external ingress must never face an external ACA
   environment. FastAPI independently verifies every forwarded access JWT.
 - Parameter examples are placeholders, not approved identities or deployment targets.
+
+The foundation requires the approved tenant and migration-admin principal type (`User` by default).
+`createValidationDatabase` defaults false; the full Azure acceptance plan explicitly enables the second
+synthetic database and includes its cost. Complete API/frontend parameter examples and a separate cloud
+runtime env example are provided. Keep populated copies ignored under `.local/`.
+See [the temporary lab runbook](../docs/AZURE_LAB_RUNBOOK.md); no command has provisioned these resources.
 
 The approved initial tenant and sole user are stored only in ignored `.local/` configuration. Its
 API/frontend `*.authorization.parameters.json` files are partial inputs, not deployment commands.

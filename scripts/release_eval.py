@@ -136,6 +136,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=["references", "live", "replay"], default="references")
     parser.add_argument("--allow-cloud-call", action="store_true")
+    parser.add_argument("--azure-sql", action="store_true", help="Approved private Azure SQL acceptance only")
+    parser.add_argument(
+        "--env-file", type=Path, default=Path(".env"), help="Separate private configuration file"
+    )
     parser.add_argument("--ids", help="Comma-separated case IDs; omitted means the entire frozen suite")
     parser.add_argument("--limit", type=int, default=80)
     parser.add_argument(
@@ -161,8 +165,14 @@ def main() -> int:
         parser.error("Set an explicit limit between suite size and 100 calls")
     for logger_name in ("httpx", "httpcore", "openai", "azure"):
         logging.getLogger(logger_name).setLevel(logging.CRITICAL)
-    settings = Settings()
-    if settings.sql_host not in {"127.0.0.1", "localhost", "sqlserver"} or settings.app_env != "local":
+    settings = Settings(_env_file=args.env_file)  # type: ignore[call-arg]
+    if args.azure_sql:
+        from scripts.azure_sql import validate_target
+
+        validate_target(settings.sql_host, "SQLIntelligence", settings.entra_tenant_id)
+        if settings.app_env != "cloud" or not settings.sql_managed_identity:
+            parser.error("Azure SQL acceptance requires cloud settings and runtime managed identity")
+    elif settings.sql_host not in {"127.0.0.1", "localhost", "sqlserver"} or settings.app_env != "local":
         parser.error("This evaluation is restricted to the existing local synthetic SQL Server")
     if args.mode == "live" and settings.azure_openai_deployment != "sql-agent-model":
         parser.error("This authorized run must target sql-agent-model")
@@ -175,6 +185,7 @@ def main() -> int:
     report: dict[str, Any] = {
         "started_utc": datetime.now(timezone.utc).isoformat(),
         "mode": args.mode,
+        "database_target": "azure_sql" if args.azure_sql else "local_sql_server",
         "deployment": settings.azure_openai_deployment if args.mode == "live" else None,
         "max_output_tokens": settings.azure_openai_max_output_tokens,
         "interval_seconds": args.interval_seconds if args.mode == "live" else None,
@@ -205,7 +216,10 @@ def main() -> int:
         for fixture, database in [("baseline", "SQLIntelligence"), ("edge", "SQLIntelligenceValidation")]:
             config = settings.model_copy(update={"sql_database": database})
             db = SQLServerBackend(make_engine(config), config)
-            db.verify_identity()
+            # Cloud reference SQL runs as the separate CLI-authenticated migration operator.
+            # Model/replay execution still verifies and uses only the runtime managed identity.
+            if not (args.azure_sql and args.mode == "references"):
+                db.verify_identity()
             backends[fixture] = db
         if args.mode == "live":
             model = AzureResponsesProvider(settings)
@@ -223,7 +237,15 @@ def main() -> int:
             try:
                 if args.mode == "references":
                     if case["expect"] == "query":
-                        connection = admin_connection(backends[case["fixture"]].settings.sql_database)
+                        database = backends[case["fixture"]].settings.sql_database
+                        if args.azure_sql:
+                            from scripts.azure_sql import admin_connection as cloud_admin_connection
+
+                            connection = cloud_admin_connection(
+                                settings.sql_host, database, settings.entra_tenant_id
+                            )
+                        else:
+                            connection = admin_connection(database)
                         try:
                             cursor = connection.execute(case["reference_sql"])
                             columns = [column[0] for column in cursor.description]

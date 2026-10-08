@@ -76,13 +76,15 @@ The expected results were frozen before live testing.
 | Fresh live queries | **53/53 (100%)** |
 | Clarification/refusal cases | **8/8 (100%)** |
 | Recorded replay, no cloud calls | **61/61** |
-| Windows / Linux regression suites, including private access | **443/443 each** |
-| Mandatory security tests / direct database denials | **198/198 / 6/6 each** |
+| Windows / Linux regression suites, including portability | **466/466 each** |
+| Mandatory security tests / direct database denials | **219/219 / 6/6 each** |
 
 The initial live batch passed 35/61; quota and proposal failures were corrected and retested. Local
 acceptance passes. The delegated frontend adapter and independent API authorization pass offline tests;
 actual tenant configuration, private routing and Azure identity/database acceptance remain open. See
 [private deployment verification](docs/PRIVATE_VERIFICATION.md).
+The later [portability report](docs/PORTABILITY_VERIFICATION.md) records launch/stop tests, two fresh
+live smoke results, corrected operational failures and the latest full regression runs.
 
 This is a measured, finite development acceptance set. It does **not** establish universal SQL
 correctness, general query equivalence or zero hallucinations. Passing SQL validation alone does not
@@ -90,16 +92,19 @@ establish that the query answers the intended business question.
 
 ## Quick start — no Azure required
 
-Prerequisites: Docker Desktop with Linux containers and at least 4 GB memory; Python 3.10–3.12 for
-local initialization. Run from the repository root:
+Prerequisites: Docker Desktop with Linux containers/Ubuntu WSL integration and Python 3.10–3.12.
+Run from the repository root:
 
 ```powershell
-python -m scripts.init_local
-docker compose --profile app up -d --build --wait
+.\local.cmd start --mode mock --open-browser
+# Stop without deleting SQL data or configuration:
+.\local.cmd stop
 ```
 
 Open [the local application](http://127.0.0.1:8501/) and choose **Show total invoiced by region**.
-Initialization refuses to overwrite an existing `.env`. On an already configured checkout, skip it.
+The launcher initializes only when needed and leaves an existing `.env` unchanged.
+Ubuntu uses `bash ./local.sh start --mode mock`.
+See [portable local deployment and desktop shortcuts](docs/LOCAL_PORTABLE.md).
 
 | Region | Total invoiced (CAD) |
 |---|---:|
@@ -120,10 +125,9 @@ Privately configure `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_DEPLOYMENT=sql-agent-
 Preserve existing SQL credentials and `LOCAL_API_TOKEN`.
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.verify_live --check-config --docker
-docker compose -f compose.yaml -f compose.azure.yaml --profile app up -d --build --wait backend frontend
+.\local.cmd start --mode live --open-browser
 # This next command makes one billable inference call:
-.\.venv\Scripts\python.exe -m scripts.verify_live --allow-cloud-call
+.\local.cmd verify-live --allow-cloud-call
 ```
 
 The sidebar must say **Live Azure OpenAI** and show the deployment. The helper checks the running
@@ -131,8 +135,17 @@ provider, submits the highest-invoice question through the authenticated API, th
 against an independent Python oracle. Starting the UI does not itself call the model. Host Python
 can use Azure identity instead of a resource key; cloud hosting requires managed identity and Entra.
 
-Return to mock mode with `docker compose --profile app up -d --wait backend frontend`.
+Return to mock mode with `.\local.cmd start --mode mock`.
 There is no automatic fallback from a failed live request to a mock answer.
+
+## Temporary Azure lab and long-term local use
+
+The [Azure lab runbook](docs/AZURE_LAB_RUNBOOK.md) covers approved private provisioning, real Entra/MI
+acceptance, accuracy/security evidence, rollback and complete cleanup. The model is reused outside
+the disposable application group. Preserve the local checkout, private configuration and approved
+model access; deleting the application group then does not require abandoning local use or future
+redeployment. See [actual verification status](docs/PORTABILITY_VERIFICATION.md); prepared cloud
+templates and local passing tests are not a claim that Azure acceptance has already passed.
 
 ## SQL Learning Mode
 

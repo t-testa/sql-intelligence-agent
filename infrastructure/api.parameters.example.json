@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": { "value": "FOUNDATION-OUTPUT" },
+    "runtimeIdentityName": { "value": "FOUNDATION-OUTPUT" },
+    "runtimeClientId": { "value": "FOUNDATION-OUTPUT" },
+    "image": { "value": "REGISTRY/sql-intelligence-agent@sha256:APPROVED-DIGEST" },
+    "sqlServerFqdn": { "value": "FOUNDATION-OUTPUT" },
+    "openaiEndpoint": { "value": "EXISTING-RESOURCE-ENDPOINT" },
+    "openaiDeploymentName": { "value": "sql-agent-model" },
+    "apiAudience": { "value": "APPROVED-API-CLIENT-ID" },
+    "frontendClientId": { "value": "APPROVED-FRONTEND-CLIENT-ID" },
+    "entraTenantId": { "value": "APPROVED-TENANT-ID" },
+    "allowedUserObjectIds": { "value": ["SOLE-APPROVED-OWNER-OBJECT-ID"] },
+    "applicationAccessEnabled": { "value": false },
+    "registryServer": { "value": "FOUNDATION-OUTPUT" }
+  }
+}

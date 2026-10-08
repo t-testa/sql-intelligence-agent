@@ -8,6 +8,12 @@ Local accuracy validation passed: 61/61 actual live cases, with earlier failures
 [accuracy evidence](RELEASE_VERIFICATION.md) and [private-access verification](PRIVATE_VERIFICATION.md).
 SQL Learning Mode remains permanent. No new exercises are needed for deployment.
 
+The deployment now has two required operating modes: a temporary private Azure engineering lab and
+an independently runnable local Docker Desktop/Ubuntu WSL application. Use the
+[reproducible Azure lab runbook](AZURE_LAB_RUNBOOK.md) for provisioning through cleanup and the
+[portable local runbook](LOCAL_PORTABLE.md) for launch/stop and desktop shortcuts. Actual verification
+is tracked [separately for each mode](PORTABILITY_VERIFICATION.md).
+
 ## Independent access boundaries
 
 | Asset | Access control | Initial access |
@@ -55,8 +61,9 @@ Actual effective NSG rules, routes and private DNS require cloud acceptance test
 
 The foundation now reuses OpenAI; it creates no new account/model and makes no role assignments.
 Creating its private endpoint does not disable existing public/key access. Review existing consumers
-and explicitly approve that separate cutover before private release. The local key-based workflow
-may stop working afterward. Only runtime MI receives resource-scoped Cognitive Services OpenAI User;
+and explicitly approve any network/auth change. Preserve an independently approved local access path
+outside the disposable application group; a cutover that breaks local portability is not acceptable.
+Only runtime MI receives resource-scoped Cognitive Services OpenAI User;
 the frontend receives no SQL/model role. All endpoints and grants remain approval-gated.
 
 ## Authentication and release gates
@@ -106,12 +113,13 @@ This replaces the earlier $20–40 public-demo allowance. Confirm the selected t
 | Component | Light-use monthly planning estimate |
 |---|---:|
 | SQL Basic, $0.1771/day | $5.39 |
+| Temporary second SQL Basic database for full edge-fixture acceptance | Additional $5.39 while retained |
 | ACR Basic, $0.1666/day | $5.07 |
 | GPT-4.1 mini, 1,000 questions at 2,500 input + 300 output tokens | $1.48 |
 | Two ACA apps, 0.5 vCPU/1 GiB, 50–100 active hours each; unused free grant | $0–7.56 |
 | Three private endpoints: SQL, OpenAI, token store | $24–45 allowance, not a verified tariff |
 | DNS, small token storage, logs/alerts | $1–11 allowance |
-| **Subtotal before private user connectivity** | **Approximately $40–80/month** |
+| **Subtotal including temporary edge database, before private user connectivity** | **Approximately $45–85/month** |
 | VPN/private workstation/DNS resolver | **Unpriced until route/SKU selection** |
 
 This is not a complete approved budget. A new VPN gateway or resolver can dominate the subtotal.
@@ -151,3 +159,8 @@ images and token storage. Never delete the reused model resource or unrelated gr
 resources and subsequent billing; stopped apps do not stop SQL, registry, endpoint, VPN or log charges.
 
 The separate [showcase content plan](PUBLIC_SHOWCASE_APPROVAL.md) stays private until approved.
+
+For this temporary lab, the deletion inventory must also include cross-group role assignments,
+Entra objects, private endpoint connections on the reused model, peerings and DNS links. Preserve
+redeployment inputs/evidence outside Azure and verify local live operation again after cleanup.
+Never remove the model resource as part of deleting the dedicated application group.

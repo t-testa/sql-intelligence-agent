@@ -12,6 +12,7 @@ COPY backend backend
 COPY frontend frontend
 COPY scripts scripts
 COPY sql sql
+COPY evaluation evaluation
 COPY .streamlit .streamlit
 RUN useradd --uid 10001 --create-home appuser
 USER appuser

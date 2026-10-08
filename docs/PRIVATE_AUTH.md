@@ -15,8 +15,8 @@ cloud API access remains disabled. Saving this configuration did not create an E
 
 Obtain the tenant ID and **user object ID in that tenant** explicitly approved by the owner. Do not
 use an email string as the API allowlist value; do not infer approval from CLI/GitHub login. Initially
-there is exactly one user. Also identify the approved API/frontend registration IDs, SQL administrator
-group, private user route, target subscription/group and private GitHub repository. Keep these private.
+there is exactly one user. Also identify the approved API/frontend registration IDs, SQL migration
+administrator, private user route, target subscription/group and private GitHub repository. Keep these private.
 
 Create registrations/credentials/consents/assignments only after the owner approves those exact changes.
 Use existing compatible registrations where practical. No subscriptions roles are needed by app users.
@@ -115,5 +115,5 @@ the old JWT is denied. The app and source repository are revoked independently.
 6. Preserve sanitized outcome counts in a private report. Leave access disabled if a mandatory gate fails.
 
 Metadata checks and locally signed JWT tests are not actual cloud sign-in validation. The current
-preflight still blocks on registration/callback and repository values; owner approval is recorded.
+preflight still blocks on registration/callback values; owner approval and the private repository are recorded.
 No provisioning request is being made.

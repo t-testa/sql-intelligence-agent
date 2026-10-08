@@ -1,3 +1,4 @@
 # Frozen evaluation records include byte-level SHA-256 provenance.
 # Preserve their original bytes across Windows and Linux checkouts.
 evaluation/** -text whitespace=cr-at-eol
+*.sh text eol=lf

@@ -5,9 +5,15 @@ param location string = resourceGroup().location
 @minLength(3)
 @maxLength(12)
 param prefix string = 'sqlintel'
-@description('Object ID of the explicitly approved Entra SQL administrator group.')
+@description('Object ID of the explicitly approved Entra SQL migration administrator.')
 param sqlAdminObjectId string
 param sqlAdminDisplayName string
+@allowed(['User', 'Group'])
+param sqlAdminPrincipalType string = 'User'
+@description('Explicitly approved tenant; use the same tenant as API/frontend authorization.')
+param entraTenantId string
+@description('Temporary second synthetic fixture database required for the full 61-case Azure evaluation.')
+param createValidationDatabase bool = false
 param existingOpenaiName string
 param existingOpenaiResourceGroup string
 param existingOpenaiSubscriptionId string = subscription().subscriptionId
@@ -161,10 +167,10 @@ resource sql 'Microsoft.Sql/servers@2023-08-01' = {
     publicNetworkAccess: 'Disabled'
     administrators: {
       administratorType: 'ActiveDirectory'
-      principalType: 'Group'
+      principalType: sqlAdminPrincipalType
       login: sqlAdminDisplayName
       sid: sqlAdminObjectId
-      tenantId: tenant().tenantId
+      tenantId: entraTenantId
       azureADOnlyAuthentication: true
     }
   }
@@ -182,6 +188,14 @@ resource sqlConnectionPolicy 'Microsoft.Sql/servers/connectionPolicies@2023-08-0
   parent: sql
   name: 'default'
   properties: { connectionType: 'Proxy' }
+}
+resource validationDatabase 'Microsoft.Sql/servers/databases@2023-08-01' = if (createValidationDatabase) {
+  parent: sql
+  name: 'SQLIntelligenceValidation'
+  location: location
+  tags: tags
+  sku: { name: 'Basic', tier: 'Basic', capacity: 5 }
+  properties: { maxSizeBytes: 2147483648 }
 }
 
 // REUSE ONLY. No new OpenAI account, deployment, role grant or existing-account network change.
@@ -269,3 +283,10 @@ output frontendIdentityName string = frontendIdentity.name
 output frontendPrincipalId string = frontendIdentity.properties.principalId
 output registryServer string = registry.properties.loginServer
 output tokenStorageName string = tokenStorage.name
+output environmentDefaultDomain string = environment.properties.defaultDomain
+output environmentStaticIp string = environment.properties.staticIp
+output applicationVnetId string = network.id
+output sqlServerName string = sql.name
+output registryName string = registry.name
+output runtimeIdentityId string = identity.id
+output frontendIdentityId string = frontendIdentity.id
