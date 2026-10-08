@@ -1,8 +1,9 @@
 # Temporary private Azure deployment and teardown
 
-This is the reproducible execution plan, **not evidence of an Azure deployment**. No new resource,
-identity grant or public endpoint is approved by this document. Complete identity/predeployment checks
-before requesting approval for a named resource inventory, short operating window and spending limit.
+This is the reproducible execution plan, **not evidence of an Azure deployment**. The owner authorized
+the private deployment objective and routine identity preparation. The October 8
+[actual preflight and itemized proposal](AZURE_PREFLIGHT_2026-10-08.md) records completed checks and the
+remaining cost/sequence exception. No billable resource is approved by this document.
 Keep the full GitHub repository private. SQL Learning Mode and the existing validation/security gateway
 are required in both operating modes. See [local operations](LOCAL_PORTABLE.md) for the independent fallback.
 
@@ -39,22 +40,24 @@ owner backup; inject them through ignored ARM parameter files with `@secure` tem
 Use the already approved sole owner and tenant from ignored private configuration. Finish
 [PRIVATE_AUTH.md](PRIVATE_AUTH.md): two single-tenant registrations, exact delegated scope/audience,
 approved frontend client, owner-only assignments and consent, and an exact private HTTPS callback.
-Creating registrations, credentials or grants still needs explicit approval. SQL migration admin is a
-separate privileged role: explicitly approve the owner for it; do not invent a group or grant anyone else.
+The current deployment instruction authorizes sole-owner identity preparation; the two registrations,
+owner-only assignments and per-owner delegated consent now exist, with sign-in disabled. SQL migration
+admin remains a separate privileged role assigned only to that approved owner, never an invented group.
 The foundation now accepts `User` (default) or an explicitly approved `Group`, and an explicit tenant.
 
-Choose a stable private frontend hostname and its DNS/TLS certificate plan before approval. The default
-ACA hostname is generated only after its environment exists. It cannot satisfy the earlier exact-callback
-gate in advance. Reuse an existing verified internal environment, or prepare an owner-approved stable
-private hostname/certificate and custom-domain binding. **A missing route, hostname or certificate is a
-blocker, not permission to expose public ingress.** The current frontend template uses the generated ACA
-hostname; a stable custom binding must be supplied and reviewed before using that alternative.
+The proposed route uses the default ACA hostname and platform TLS certificate. Azure generates the
+domain only after the internal environment exists. The preflight therefore requests an explicit staged
+callback gate: prepare/verify registration metadata now, configure the exact generated callback after
+foundation provisioning, keep frontend ingress and API access off until authentication is configured.
+Do not fabricate a callback or claim real login has passed. No custom domain purchase is proposed.
 
 Select an existing approved VPN/connected workstation/private route where possible. Confirm no overlap
 with `10.48.0.0/16`; the current application subnet is `10.48.0.0/23`, endpoint subnet `10.48.2.0/24`.
-Specify a distinct approved migration subnet. Only that subnet and app infrastructure may reach SQL;
-browser subnet access to SQL/token storage remains denied. Plan private DNS forwarding for owner and
-migration clients, not just VNet links. New VPN/resolver/VM costs need a separate explicit quote.
+The cost-exception proposal adds a Windows operator VM and free Bastion Developer. Its maintenance
+subnet is `10.48.3.0/24`, browser subnet `10.48.4.0/24`. Enable `includeOperatorSubnets` only for that
+approved topology. Only maintenance/app infrastructure may reach SQL/token storage. Remove maintenance
+access and move the deallocated VM to the browser subnet before application use, as specified in the
+preflight report. Edge runs inside the VM and uses VNet-linked DNS; no VPN/resolver is proposed.
 
 Cloud inference must resolve the reused OpenAI hostname through its private endpoint. Preserve an
 approved authenticated local access path to that same account independently of the lab group. Do not
@@ -69,6 +72,8 @@ az bicep build --file infrastructure/main.bicep --outfile artifacts/lab-foundati
 az bicep build --file infrastructure/private_dns.bicep --outfile artifacts/lab-dns.json
 az bicep build --file infrastructure/application.bicep --outfile artifacts/lab-api.json
 az bicep build --file infrastructure/frontend.bicep --outfile artifacts/lab-frontend.json
+az bicep build --file infrastructure/operator.bicep --outfile artifacts/lab-operator.json
+az bicep build --file infrastructure/lab.bicep --outfile artifacts/lab-subscription.json
 .\local.cmd test
 ```
 
@@ -78,10 +83,10 @@ Before approval, copy parameter examples into ignored `.local/`; fill placeholde
 secure parameters. The complete 61-case cloud acceptance requires `createValidationDatabase=true`
 for the edge fixture. This adds a second temporary SQL Basic database to the billable inventory.
 
-Use the dated prices in [the release plan](AZURE_RELEASE_PLAN.md), then refresh the quote before approval.
-The earlier $40–80/month subtotal becomes roughly **$45–85/month with the second database**, still
-excluding owner connectivity and any custom-domain/certificate costs. A three-day lab is not guaranteed
-to cost exactly 3/30 of that figure: check meter minimums, active compute, traffic and log volume.
+Use the dated [resource-by-resource preflight quote](AZURE_PREFLIGHT_2026-10-08.md), then refresh it before
+approval. It includes the previously omitted ACA-managed load balancer/outbound IP and an actual browser
+route: **$85–100/month planning allowance**, or approximately **$12–18 for the proposed 72-hour lab**.
+The requested lab allowance is $20 before tax; budgets alert and are not hard spending caps.
 Local Compose has no application-hosting Azure charges; live questions still consume OpenAI tokens.
 
 ## 3. Provision only after explicit approval
@@ -101,10 +106,12 @@ $foundation = az deployment group show --subscription $subscription --resource-g
 az deployment group create --subscription $subscription --resource-group $labGroup --name private-dns --template-file infrastructure/private_dns.bicep --parameters environmentDefaultDomain=$($foundation.environmentDefaultDomain.value) environmentStaticIp=$($foundation.environmentStaticIp.value) applicationVnetId=$($foundation.applicationVnetId.value) --output none
 ```
 
-For a new group, the group itself contains no billable workload; a resource-group what-if requires it
-to exist. Review the compiled resource inventory before approval, then review this final what-if before
-the first billable deployment. Provider registration, route/peering and existing-resource endpoint
-approval are separate reviewed actions, not silently performed by these helpers.
+Before creating a new group, use the subscription wrapper `infrastructure/lab.bicep` with
+`az deployment sub what-if --location canadaeast --template-file infrastructure/lab.bicep --parameters
+'@.local/lab-what-if.parameters.json'`. That actual preflight succeeded without creating the group.
+The what-if password is disposable test input: **never deploy that file**. Create separate secure
+deployment inputs after approval. Review later stages with group what-if before applying them.
+Providers are registered; no billable workloads were created by registration or what-if.
 
 Foundation resources: internal ACA environment, two user-assigned identities, VNet/endpoint NSG,
 private SQL server and baseline/optional edge databases, OpenAI/SQL/blob private endpoints and DNS,
@@ -116,7 +123,8 @@ below and do not claim automatic distributed tracing.
 
 The second DNS stage uses the generated environment domain and static private IP for wildcard/apex
 records, following [Microsoft's internal DNS guidance](https://learn.microsoft.com/en-us/azure/container-apps/vnet-custom).
-Separately configure the approved client route/forwarder and stable frontend binding, if selected.
+Deploy the approved optional `operator.bicep` separately with a securely generated VM credential and
+the reviewed image/SKU. Do not choose the portal's default paid Bastion Standard deployment. Use Developer.
 Verify DNS from the actual browser host, migration host and API network; do not rely only on ARM flags.
 
 After separately approved grants, give runtime MI **Cognitive Services OpenAI User** only at the existing
@@ -173,7 +181,10 @@ Fill `.local/api.parameters.json` and `.local/frontend.parameters.json` from the
 outputs. Use the same `${registryHost}/sql-intelligence-agent@${digest}` for both, exact sole-owner IDs,
 the existing model, the verified private callback, and **API access disabled**. Securely supply the OAuth
 secret and short-lived user-delegation SAS only in the private frontend parameter file. Never print it.
-Deploy API first, then fill the frontend's `apiFqdn` from its output and deploy frontend:
+Deploy API first, then fill the frontend's `apiFqdn` from its output and deploy frontend with
+`enablePrivateIngress=false`. Derive the web hostname from its fixed app name and environment domain.
+Configure and read back the exact Entra callback, sole-owner assignments and Easy Auth before a second
+frontend deployment sets `enablePrivateIngress=true`. This prevents an initial unauthenticated ingress window.
 
 ```powershell
 az deployment group create --subscription $subscription --resource-group $labGroup --name api --template-file infrastructure/application.bicep --parameters '@.local/api.parameters.json' --output none

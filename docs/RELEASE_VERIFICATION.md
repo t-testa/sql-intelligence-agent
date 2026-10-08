@@ -156,17 +156,20 @@ reference comparison; the UI showed the reference SQL and complete result table.
 **NO-GO for claiming a validated Azure-hosted release today.**
 
 1. **Actual cloud authentication is unverified.** The later private-access adapter and offline tests
-   are implemented. Approved tenant/user/registration IDs and real platform login/renewal still need
-   verification. Do not substitute a local shared bearer token.
+   are implemented. The October 8 [deployment preflight](AZURE_PREFLIGHT_2026-10-08.md) verified the
+   approved tenant/user and created/read back owner-only registrations and consent. The exact private
+   callback and real platform login/renewal remain outstanding. Do not substitute a local shared token.
 2. **Cloud infrastructure/identity acceptance is outstanding.** The tests used real local SQL Server
    2022 Developer. Repeat permission, reference, replay, timeout and live acceptance checks on the
    approved Azure SQL instance; verify actual MI, tenant auth, networking/DNS/TLS and token renewal.
 3. **Deployment configuration and monitoring need final approval/validation.** Review the reuse-first
    topology, immutable registry images, ingress settings, alert delivery and persistent quota needs.
    The process-local daily budget resets on restart and cannot guarantee a cloud spending ceiling.
-4. **Owner approval is required for billable resources, access grants and showcase contents.** The
-   revised plan is private by default, keeps source PRIVATE and now reuses the existing OpenAI account.
-   Identity/predeployment gates must finish before provisioning approval is requested.
+4. **The cost/sequence exception is awaiting owner approval.** Preflight's final what-if passed with
+   33 proposed creations and no modifications/deletions. The complete private topology exceeds the
+   prior $20–40/month target. No billable resources were created. The callback must be completed after
+   the internal environment assigns its domain, with application ingress/access off meanwhile.
+   Public showcase contents and any additional users remain separately approval-gated.
 
 The [private Azure plan](AZURE_RELEASE_PLAN.md) supplies a reuse strategy, revised cost scenarios,
 authentication/rate/monitoring requirements,

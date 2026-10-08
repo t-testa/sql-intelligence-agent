@@ -71,6 +71,11 @@ Current results, exact failure rates, retests, model receipts and release blocke
 [evaluation/recordings](evaluation/recordings), including quota errors and incorrect SQL proposals.
 The expected results were frozen before live testing.
 
+The [Azure preflight report](docs/AZURE_PREFLIGHT_2026-10-08.md) records the newer **467/467 Windows
+regression and 220/220 security** run, owner-only Entra setup and a successful 33-create Azure what-if.
+Billable provisioning awaits the documented cost/sequence exception. Real Azure application sign-in
+and Azure SQL acceptance have not run. The earlier portable verification below remains dated evidence.
+
 | Final October 8 verification | Result |
 |---|---:|
 | Fresh live queries | **53/53 (100%)** |

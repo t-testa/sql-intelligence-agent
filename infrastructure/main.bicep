@@ -19,6 +19,8 @@ param existingOpenaiResourceGroup string
 param existingOpenaiSubscriptionId string = subscription().subscriptionId
 @description('Explicit migration-host subnet only; empty means no migration access to private endpoints.')
 param migrationSubnetPrefix string = ''
+@description('Optional temporary operator VM subnets. No VM is created by this template.')
+param includeOperatorSubnets bool = false
 
 var suffix = uniqueString(resourceGroup().id)
 var tags = { project: 'sql-intelligence-agent', data: 'synthetic', milestone: 'M2' }
@@ -79,7 +81,8 @@ resource endpointSecurity 'Microsoft.Network/networkSecurityGroups@2023-09-01' =
           sourceAddressPrefix: migrationSubnetPrefix
           sourcePortRange: '*'
           destinationAddressPrefix: '10.48.2.0/24'
-          destinationPortRange: '1433'
+          // Maintenance only: SQL bootstrap and private token-container SAS issuance.
+          destinationPortRanges: ['1433', '443']
         }
       }
     ])
@@ -92,7 +95,7 @@ resource network 'Microsoft.Network/virtualNetworks@2023-09-01' = {
   tags: tags
   properties: {
     addressSpace: { addressPrefixes: ['10.48.0.0/16'] }
-    subnets: [
+    subnets: concat([
       {
         name: 'container-apps'
         properties: {
@@ -108,7 +111,16 @@ resource network 'Microsoft.Network/virtualNetworks@2023-09-01' = {
           networkSecurityGroup: { id: endpointSecurity.id }
         }
       }
-    ]
+    ], includeOperatorSubnets ? [
+      {
+        name: 'operator-maintenance'
+        properties: { addressPrefix: '10.48.3.0/24', defaultOutboundAccess: false }
+      }
+      {
+        name: 'operator-browser'
+        properties: { addressPrefix: '10.48.4.0/24', defaultOutboundAccess: false }
+      }
+    ] : [])
   }
 }
 

@@ -1,7 +1,8 @@
 # Private Azure templates — preparation only
 
 No template has been applied. Follow the [private plan](../docs/AZURE_RELEASE_PLAN.md) and
-[Entra runbook](../docs/PRIVATE_AUTH.md). All billable changes and access grants need approval.
+[actual October 8 preflight](../docs/AZURE_PREFLIGHT_2026-10-08.md). Entra owner-only preparation is
+complete; the billable topology/callback sequence awaits the explicitly requested exception.
 
 - `main.bicep`: internal ACA/public network disabled; private SQL Basic, endpoint NSG/DNS, separate
   API/frontend MI, authenticated ACR Basic, private token storage, logs and insights. Reuses OpenAI;
@@ -11,9 +12,14 @@ No template has been applied. Follow the [private plan](../docs/AZURE_RELEASE_PL
 - `application.bicep`: private Entra API, runtime MI, strict inference limits, one replica and API
   access **disabled by default**. Initially accepts exactly one approved user object ID.
 - `frontend.bicep`: private-network Streamlit, owner-only Easy Auth and delegated API scope/token store.
+  `enablePrivateIngress=false` on the first deployment prevents ingress before auth is installed.
   Must target the verified internal environment. Its external ingress must never face an external ACA
   environment. FastAPI independently verifies every forwarded access JWT.
 - Parameter examples are placeholders, not approved identities or deployment targets.
+- `lab.bicep`: subscription wrapper for a what-if against a new group without creating the group first.
+  Optional operator host defaults off. Do not deploy disposable what-if password inputs.
+- `operator.bicep`: separately approved temporary Windows D2as v4 VM, Standard SSD/outbound IP,
+  private RDP NSG and free Bastion Developer; its additional charges are in the preflight quote.
 
 The foundation requires the approved tenant and migration-admin principal type (`User` by default).
 `createValidationDatabase` defaults false; the full Azure acceptance plan explicitly enables the second
@@ -30,10 +36,11 @@ Compile using [DEPLOYMENT.md](../DEPLOYMENT.md). Compilation does not prove priv
 consent, effective permissions, regional availability or Azure SQL accuracy. Read-only preflight
 rejects reused public environments. Images must use immutable digests and private registry identity.
 
-After approval, narrow grants remain necessary: runtime OpenAI User on the existing model resource,
+After the cost/sequence approval, narrow grants remain necessary: runtime OpenAI User on the existing model resource,
 AcrPull for both container identities, a contained read-only SQL user, and a scoped token-store SAS
 rotation identity. No hidden role-assignment resources are included. SQL bootstrap, Entra registration/
-consent, private browser DNS/routing and alerts remain separate reviewed gates.
+consent read-back, private browser DNS/routing and alerts remain reviewed gates. The metadata checks
+passed for the created owner-only registrations; actual platform login remains unexecuted.
 
 Existing OpenAI public/key-auth properties are not changed by this foundation; review the private
 cutover separately. Storage denies shared-key/public access, so the private token-store SAS must be a

@@ -1,15 +1,17 @@
 # Entra configuration and private acceptance runbook
 
-Status: adapter and offline security tests implemented; actual tenant configuration and platform
-sign-in **not verified**. Do not request billable provisioning approval until the identity and
-predeployment checks below are complete. No tenant changes or access grants have been made.
+Status October 8: adapter/offline tests pass. Two single-tenant registrations, sole-owner assignments
+and per-owner delegated consent were created and independently read back under the current deployment
+authorization. Both enterprise applications remain disabled. Exact callback, secrets/token store and
+real platform sign-in are **not verified**. See the [actual preflight](AZURE_PREFLIGHT_2026-10-08.md) and
+its explicit staged-callback/cost exception request; no billable infrastructure was created.
 
 The owner has now explicitly approved the sole initial tenant/user. Those exact identifiers are saved
 in ignored `.local/private-preflight.json`, `.local/cloud-authorization.env`, and the two partial
 `.local/*.authorization.parameters.json` files, as well as the local `.env` Entra settings. The API and
 frontend templates require the same explicit `entraTenantId`; they no longer infer it from the operator.
-Examples and source files retain placeholders. Registration IDs and private callback are still unset;
-cloud API access remains disabled. Saving this configuration did not create an Entra assignment.
+Examples and source files retain placeholders. Registration IDs now reside in private configuration;
+the generated private callback is still unset. Cloud API access and enterprise sign-in remain disabled.
 
 ## Required approved values
 
@@ -39,10 +41,10 @@ Graph permission merely to log in. ID-token issuance for frontend sign-in is req
 ID token valid for FastAPI. Azure app registration details are described in
 [Microsoft's Entra setup](https://learn.microsoft.com/en-us/azure/container-apps/authentication-entra).
 
-Private hostname selection is a predeployment dependency. Prefer an approved stable private name
-whose DNS/certificate plan is known. If only a newly generated ACA hostname is available, the exact
-callback cannot be verified yet; keep that gate explicitly blocked rather than inventing a URI or
-claiming cloud authentication complete. Do not add wildcard, public-demo or unreviewed callbacks.
+Private hostname selection is a predeployment dependency. The proposal uses the generated ACA hostname
+and platform certificate, with ingress off while its exact callback is configured. Approval of that
+staged sequence is pending. Keep the callback gate explicitly blocked until the domain exists; do not
+invent a URI, add a wildcard/public callback or claim cloud authentication complete.
 
 ## Runtime configuration
 
@@ -115,5 +117,5 @@ the old JWT is denied. The app and source repository are revoked independently.
 6. Preserve sanitized outcome counts in a private report. Leave access disabled if a mandatory gate fails.
 
 Metadata checks and locally signed JWT tests are not actual cloud sign-in validation. The current
-preflight still blocks on registration/callback values; owner approval and the private repository are recorded.
-No provisioning request is being made.
+preflight still blocks on the generated callback and disabled sign-in; registration metadata, owner
+approval and private repository visibility have been verified. See the dated preflight for remaining gates.

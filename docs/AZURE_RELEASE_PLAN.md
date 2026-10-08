@@ -4,6 +4,10 @@ Updated October 8, 2026. **The full repository and application remain private.**
 earlier public-demo proposal. No public application endpoint is planned. No source publication,
 collaborator invitation, tenant grant or provisioning is authorized by this document.
 
+The owner subsequently authorized routine private deployment work, subject to a cost exception for
+new fixed charges. Read the [executed preflight and exact proposal](AZURE_PREFLIGHT_2026-10-08.md):
+identity metadata and what-if are verified; new billable provisioning remains blocked on that exception.
+
 Local accuracy validation passed: 61/61 actual live cases, with earlier failures retained. See
 [accuracy evidence](RELEASE_VERIFICATION.md) and [private-access verification](PRIVATE_VERIFICATION.md).
 SQL Learning Mode remains permanent. No new exercises are needed for deployment.
@@ -55,7 +59,7 @@ external environment. Preflight rejects that reuse. Microsoft's
 Reuse an approved VPN/connected workstation/private route where possible. Select its source subnet,
 private DNS resolution and return routes before provisioning approval. Never enable public ingress
 as a connectivity workaround. The browser subnet must not reach SQL/token storage. Endpoint NSG rules
-allow application-subnet 443/1433, optionally SQL 1433 from an explicitly approved migration subnet,
+allow application-subnet 443/1433, optionally 1433/443 from an explicitly approved maintenance subnet,
 and deny other inbound traffic. SQL Proxy connection policy keeps the reviewed SQL path on 1433.
 Actual effective NSG rules, routes and private DNS require cloud acceptance tests.
 
@@ -85,16 +89,16 @@ put these values in Git, frontend environment variables or logs. See Microsoft's
    `t-testa/sql-intelligence-agent` and authorized an audited private source push. GitHub API metadata
    confirms private visibility and Pages off; see the [source audit](GITHUB_PUBLICATION.md). Preserve
    these settings. Public mirrors/packages and collaborator invitations remain unauthorized.
-2. Inspect or prepare two single-tenant registrations, exact private callback, delegated consent and
-   owner-only enterprise-app assignments. Obtain approval before creating credentials, registrations,
-   consents, assignments or roles. Complete these identity/configuration checks **before requesting
-   billable provisioning approval**. Owner tenant/user approval is recorded; registration IDs and the
-   exact private callback remain outstanding.
+2. Two single-tenant registrations, owner-only assignments and per-owner delegated consent now exist.
+   Their metadata and the approved CLI owner were verified; enterprise sign-in stays disabled. The
+   proposed staged callback gate needs explicit approval: configure the exact generated ACA hostname
+   after internal foundation creation, with frontend ingress/API access off until auth is ready.
 3. Finish private routing/DNS, reuse inventory, resource names, approved subnets, protected build path,
    expiry/rotation ownership and a dated cost quote. Compile templates and review a parameterized
    `what-if`. These read-only checks do not authorize deployment.
-4. Only then request approval for the concrete resources, narrow grants and budget. This gate has not
-   been reached. GitHub Actions contains no Azure deployment or public publication job.
+4. Request the grouped cost/sequence exception for the concrete preflight inventory. What-if succeeded
+   with 33 proposed creations and no changes/deletions. No billable resource has been created.
+   GitHub Actions contains no Azure deployment or public publication job.
 5. After approval, provision privately with API access disabled; bootstrap synthetic SQL from the
    approved migration host, create the contained runtime MI user and apply reviewed grants/DENY.
    Build/scan images and deploy immutable digests to the private registry.
@@ -107,27 +111,22 @@ put these values in Git, frontend environment variables or logs. See Microsoft's
 
 ## Costs and safeguards
 
-October 8 Canada East USD retail evidence is in `evaluation/pricing-snapshot.json`; before tax.
-This replaces the earlier $20–40 public-demo allowance. Confirm the selected topology in a current quote.
+The [October 8 preflight quote](AZURE_PREFLIGHT_2026-10-08.md) replaces the incomplete earlier estimates.
+Current public retail meters, complete cost assumptions and exact resource inventory are recorded there.
+The fixed portion is approximately **$75.85/month**; light use totals **$82.56–96.86/month**, with an
+**$85–100 planning allowance**. This includes two SQL Basic databases, all private endpoints/DNS,
+ACR, ACA's previously omitted managed load balancer/outbound IP, and the private browser host.
 
-| Component | Light-use monthly planning estimate |
-|---|---:|
-| SQL Basic, $0.1771/day | $5.39 |
-| Temporary second SQL Basic database for full edge-fixture acceptance | Additional $5.39 while retained |
-| ACR Basic, $0.1666/day | $5.07 |
-| GPT-4.1 mini, 1,000 questions at 2,500 input + 300 output tokens | $1.48 |
-| Two ACA apps, 0.5 vCPU/1 GiB, 50–100 active hours each; unused free grant | $0–7.56 |
-| Three private endpoints: SQL, OpenAI, token store | $24–45 allowance, not a verified tariff |
-| DNS, small token storage, logs/alerts | $1–11 allowance |
-| **Subtotal including temporary edge database, before private user connectivity** | **Approximately $45–85/month** |
-| VPN/private workstation/DNS resolver | **Unpriced until route/SKU selection** |
+The proposed temporary lab is **up to 72 hours, approximately $12–18**, with a requested **$20 before-tax
+allowance** and at most 20 operator-VM hours. These costs materially exceed the earlier $20–40 monthly
+target if resources are retained. Obtain the explicit exception before provisioning. Budget alerts
+do not stop spending; a retained VM, database, endpoint or load balancer keeps accruing applicable costs.
 
-This is not a complete approved budget. A new VPN gateway or resolver can dominate the subtotal.
-Internal ACA does not itself require an ACA environment private endpoint; avoid adding this feature
-without reviewing its management charge. The observed $0.12/hour meter, if applicable to a selected
-feature, adds $87.60/month. Continuously open Streamlit sessions can keep replicas active; both apps
-running continuously would cost roughly $103/month in CPU/memory alone after the unused free grant.
-See [ACA billing](https://learn.microsoft.com/en-us/azure/container-apps/billing).
+The browser route uses free Bastion Developer with a reviewed Windows D2as v4 VM, deallocated between
+sessions. No VPN, NAT gateway, paid Bastion, Private DNS Resolver or ACA environment private endpoint is
+selected. The VM's public IP supplies outbound connectivity only; NSG rules deny public inbound traffic.
+The application stays private. Closing Streamlit sessions permits scaling to zero; it does not remove
+fixed infrastructure charges. See [ACA billing](https://learn.microsoft.com/en-us/azure/container-apps/billing).
 
 Preserve one API process/replica, zero minimum replicas, 6 inference requests/minute, 18,000 estimated
 tokens/minute, 100 attempts/rolling day, 1,000 output tokens and no SDK retries. SQL bounds stay at

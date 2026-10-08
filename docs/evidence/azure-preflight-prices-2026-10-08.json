@@ -1,0 +1,447 @@
+{
+  "checked_utc": "2026-10-08T20:09:44.768506+00:00",
+  "currency": "USD",
+  "region": "canadaeast / applicable global meters",
+  "source": "https://prices.azure.com/api/retail/prices",
+  "model_price_source": "Earlier October 8 snapshot preserved unchanged in evaluation/pricing-snapshot.json",
+  "assumptions": "730-hour month; retail, not invoiced costs; operator 20-40 hours; no reservations; free grants may be shared.",
+  "items": {
+    "private_link": [
+      {
+        "productName": "Virtual Network Private Link",
+        "skuName": "Standard",
+        "meterName": "Standard Private Endpoint",
+        "armRegionName": "Global",
+        "retailPrice": 0.01,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2020-02-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "e6ab7238-e433-4fe0-a2b2-2b2564df2cdb"
+      }
+    ],
+    "private_data": [
+      {
+        "productName": "Virtual Network Private Link",
+        "skuName": "Standard",
+        "meterName": "Standard Data Processed - Ingress",
+        "armRegionName": "Global",
+        "retailPrice": 0.01,
+        "unitOfMeasure": "1 GB",
+        "type": "Consumption",
+        "effectiveStartDate": "2021-11-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "10caa28b-6479-4852-9eb7-610870cb6417"
+      },
+      {
+        "productName": "Virtual Network Private Link",
+        "skuName": "Standard",
+        "meterName": "Standard Private Endpoint",
+        "armRegionName": "Global",
+        "retailPrice": 0.01,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2020-02-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "e6ab7238-e433-4fe0-a2b2-2b2564df2cdb"
+      },
+      {
+        "productName": "Virtual Network Private Link",
+        "skuName": "Standard",
+        "meterName": "Standard Data Processed - Egress",
+        "armRegionName": "Global",
+        "retailPrice": 0.01,
+        "unitOfMeasure": "1 GB",
+        "type": "Consumption",
+        "effectiveStartDate": "2021-11-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "e7f162f6-7cb8-4cea-ad4f-12cdb5dda25b"
+      }
+    ],
+    "dns": [
+      {
+        "productName": "Azure DNS",
+        "skuName": "Private",
+        "meterName": "Private Zone",
+        "armRegionName": "",
+        "retailPrice": 0.5,
+        "unitOfMeasure": "1",
+        "type": "Consumption",
+        "effectiveStartDate": "2019-12-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "0b608a26-f611-4232-8192-ce81b6b57194"
+      },
+      {
+        "productName": "Azure DNS",
+        "skuName": "Private",
+        "meterName": "Private Queries",
+        "armRegionName": "Zone 1",
+        "retailPrice": 0.4,
+        "unitOfMeasure": "1M",
+        "type": "Consumption",
+        "effectiveStartDate": "2019-12-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "46cff9cb-4b15-4af0-bf41-25143827fef8"
+      },
+      {
+        "productName": "Azure DNS",
+        "skuName": "Private",
+        "meterName": "Private Queries",
+        "armRegionName": "",
+        "retailPrice": 0.4,
+        "unitOfMeasure": "1M",
+        "type": "Consumption",
+        "effectiveStartDate": "2019-12-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "46cff9cb-4b15-4af0-bf41-25143827fef8"
+      },
+      {
+        "productName": "Azure DNS",
+        "skuName": "Private",
+        "meterName": "Private Zone",
+        "armRegionName": "Zone 1",
+        "retailPrice": 0.5,
+        "unitOfMeasure": "1",
+        "type": "Consumption",
+        "effectiveStartDate": "2019-12-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "0b608a26-f611-4232-8192-ce81b6b57194"
+      }
+    ],
+    "load_balancer": [
+      {
+        "productName": "Load Balancer",
+        "skuName": "Standard",
+        "meterName": "Standard Included LB Rules and Outbound Rules",
+        "armRegionName": "Global",
+        "retailPrice": 0.025,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-04-11T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "27827eb0-7f60-4928-940b-f5fe15e7a4cb"
+      },
+      {
+        "productName": "Load Balancer",
+        "skuName": "Standard",
+        "meterName": "Standard Overage LB Rules and Outbound Rules",
+        "armRegionName": "Global",
+        "retailPrice": 0.01,
+        "unitOfMeasure": "1/Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-04-11T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "c36503b7-0df1-4de0-af90-ea407086432c"
+      },
+      {
+        "productName": "Load Balancer",
+        "skuName": "Standard",
+        "meterName": "Standard Data Processed",
+        "armRegionName": "Global",
+        "retailPrice": 0.005,
+        "unitOfMeasure": "1 GB",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-04-11T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "dfc7cc11-fbe2-41c8-b6fa-24a574223938"
+      }
+    ],
+    "ip": [
+      {
+        "productName": "IP Addresses",
+        "skuName": "Standard",
+        "meterName": "Standard IPv4 Static Public IP",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.005,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-06-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "9c150bf9-2bad-430e-a53c-c213804f49ef"
+      },
+      {
+        "productName": "IP Addresses",
+        "skuName": "Standard",
+        "meterName": "Standard IPv4 Static Public IP",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.005,
+        "unitOfMeasure": "1 Hour",
+        "type": "DevTestConsumption",
+        "effectiveStartDate": "2018-06-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "9c150bf9-2bad-430e-a53c-c213804f49ef"
+      }
+    ],
+    "sql": [
+      {
+        "productName": "SQL Database Single Basic",
+        "skuName": "B",
+        "meterName": "B DTU",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.1771,
+        "unitOfMeasure": "1/Day",
+        "type": "Consumption",
+        "effectiveStartDate": "2016-04-25T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "c0d070a1-109a-4680-882d-ffd690a650fa"
+      }
+    ],
+    "registry": [
+      {
+        "productName": "Container Registry",
+        "skuName": "Basic",
+        "meterName": "Basic Registry Unit",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.1666,
+        "unitOfMeasure": "1/Day",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-01-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "5c9e7a65-5784-494c-9718-7749d4075dd9"
+      }
+    ],
+    "operator_candidates": [
+      {
+        "productName": "Virtual Machines Dasv4 Series Windows",
+        "skuName": "D2as v4",
+        "meterName": "D2as v4",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.199,
+        "unitOfMeasure": "1 Hour",
+        "type": "Consumption",
+        "effectiveStartDate": "2022-07-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "e41cd7fe-2e02-5ebb-b28a-156aa5d46709"
+      }
+    ],
+    "disk": [
+      {
+        "productName": "Standard SSD Managed Disks",
+        "skuName": "E10 LRS",
+        "meterName": "E10 LRS Disk",
+        "armRegionName": "canadaeast",
+        "retailPrice": 10.56,
+        "unitOfMeasure": "1/Month",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-11-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "4212d6c1-d03f-420f-bb9d-81cfef8f7af6"
+      },
+      {
+        "productName": "Standard SSD Managed Disks",
+        "skuName": "E10 LRS",
+        "meterName": "E10 LRS Disk Operations",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.002,
+        "unitOfMeasure": "10K",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-11-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "ce957933-8287-4f8b-83ee-53a5cbe056d9"
+      }
+    ],
+    "blob": [
+      {
+        "productName": "General Block Blob v2",
+        "skuName": "Hot LRS",
+        "meterName": "All Other Operations",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.0044,
+        "unitOfMeasure": "10K",
+        "type": "Consumption",
+        "effectiveStartDate": "2017-10-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "146743a2-a4c9-41f6-a3d7-50c3ea3b7a7f"
+      },
+      {
+        "productName": "General Block Blob v2",
+        "skuName": "Hot LRS",
+        "meterName": "Index Tags",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.036,
+        "unitOfMeasure": "10K/Month",
+        "type": "Consumption",
+        "effectiveStartDate": "2021-02-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "7a3ee7ae-6983-48e3-bffa-8e7f9bab466d"
+      },
+      {
+        "productName": "General Block Blob v2",
+        "skuName": "Hot LRS",
+        "meterName": "Hot LRS Write Operations",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.055,
+        "unitOfMeasure": "10K",
+        "type": "Consumption",
+        "effectiveStartDate": "2016-05-04T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "ef7de424-8c0a-43b9-9863-d82fe5e9443c"
+      },
+      {
+        "productName": "General Block Blob v2",
+        "skuName": "Hot LRS",
+        "meterName": "Hot LRS Blob Inventory",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.0028,
+        "unitOfMeasure": "1M",
+        "type": "Consumption",
+        "effectiveStartDate": "2021-10-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "9153ff1f-2c3c-5e74-acbb-093058ccfbb6"
+      },
+      {
+        "productName": "General Block Blob v2",
+        "skuName": "Hot LRS",
+        "meterName": "Hot Read Operations",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.0044,
+        "unitOfMeasure": "10K",
+        "type": "Consumption",
+        "effectiveStartDate": "2016-05-04T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "edd2d43c-473b-4b80-b11e-c044fcb0255d"
+      },
+      {
+        "productName": "General Block Blob v2",
+        "skuName": "Hot LRS",
+        "meterName": "LRS List and Create Container Operations",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.055,
+        "unitOfMeasure": "10K",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-12-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "06959938-2c2f-43b1-ae83-081f20eddf59"
+      },
+      {
+        "productName": "General Block Blob v2",
+        "skuName": "Hot LRS",
+        "meterName": "Hot LRS Data Stored",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.02,
+        "unitOfMeasure": "1 GB/Month",
+        "type": "Consumption",
+        "effectiveStartDate": "2017-02-03T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "84af43ae-2cff-46f6-96e1-f03d27dfeb55"
+      }
+    ],
+    "logs": [
+      {
+        "productName": "Log Analytics",
+        "skuName": "Analytics Logs",
+        "meterName": "Analytics Logs Data Ingestion",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.0,
+        "unitOfMeasure": "1 GB",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-02-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "3922f669-7ee4-46e2-bae0-1ad81e836f69"
+      },
+      {
+        "productName": "Log Analytics",
+        "skuName": "Analytics Logs",
+        "meterName": "Analytics Logs Data Ingestion",
+        "armRegionName": "canadaeast",
+        "retailPrice": 2.76,
+        "unitOfMeasure": "1 GB",
+        "type": "Consumption",
+        "effectiveStartDate": "2018-02-01T00:00:00Z",
+        "tierMinimumUnits": 5.0,
+        "meterId": "3922f669-7ee4-46e2-bae0-1ad81e836f69"
+      }
+    ],
+    "aca": [
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard Requests",
+        "armRegionName": "canadaeast",
+        "retailPrice": 0.4,
+        "unitOfMeasure": "1M",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "537681d8-166a-5738-b913-a5ee4b8cb673"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard Memory Active Usage",
+        "armRegionName": "canadaeast",
+        "retailPrice": 4e-06,
+        "unitOfMeasure": "1 GiB Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "86165413-a365-54d8-a555-2c98f9509c2c"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard vCPU Active Usage",
+        "armRegionName": "canadaeast",
+        "retailPrice": 3.4e-05,
+        "unitOfMeasure": "1 Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "8f5309df-88ea-502f-853c-56a680e3a301"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard vCPU Idle Usage",
+        "armRegionName": "canadaeast",
+        "retailPrice": 4e-06,
+        "unitOfMeasure": "1 Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "97e94a76-4be9-5abb-b4ba-2f22bb455076"
+      },
+      {
+        "productName": "Azure Container Apps",
+        "skuName": "Standard",
+        "meterName": "Standard Memory Idle Usage",
+        "armRegionName": "canadaeast",
+        "retailPrice": 4e-06,
+        "unitOfMeasure": "1 GiB Second",
+        "type": "Consumption",
+        "effectiveStartDate": "2023-09-01T00:00:00Z",
+        "tierMinimumUnits": 0.0,
+        "meterId": "a76c5b72-71c0-503a-ae02-56a174bb3478"
+      }
+    ],
+    "openai": [
+      {
+        "productName": "Azure OpenAI",
+        "skuName": "gpt 4.1 mini Inp glbl",
+        "meterName": "gpt 4.1 mini Inp glbl Tokens",
+        "retailPrice": 0.0004,
+        "unitOfMeasure": "1K",
+        "type": "Consumption",
+        "effectiveStartDate": "2025-04-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure OpenAI",
+        "skuName": "gpt 4.1 mini Outp glbl",
+        "meterName": "gpt 4.1 mini Outp glbl Tokens",
+        "retailPrice": 0.0016,
+        "unitOfMeasure": "1K",
+        "type": "Consumption",
+        "effectiveStartDate": "2025-04-01T00:00:00Z"
+      },
+      {
+        "productName": "Azure OpenAI",
+        "skuName": "gpt 4.1 mini cached Inp glbl",
+        "meterName": "gpt 4.1 mini cached Inp glbl Tokens",
+        "retailPrice": 0.0001,
+        "unitOfMeasure": "1K",
+        "type": "Consumption",
+        "effectiveStartDate": "2025-04-01T00:00:00Z"
+      }
+    ]
+  }
+}

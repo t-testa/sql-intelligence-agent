@@ -4,7 +4,12 @@ import copy
 
 import pytest
 
-from scripts.private_preflight import initial_identity_config, registration_checks, single_owner_assignments
+from scripts.private_preflight import (
+    approved_identity_config,
+    initial_identity_config,
+    registration_checks,
+    single_owner_assignments,
+)
 from tests.security.test_private_access import API, FRONTEND, OTHER, OWNER, TENANT
 
 CONFIG = {
@@ -15,6 +20,14 @@ CONFIG = {
     "owner_approval_recorded": True,
     "private_redirect_uri": "https://private.example/.auth/login/aad/callback",
 }
+
+
+def test_unassigned_callback_allows_metadata_inspection_but_never_passes_release_gate():
+    pending = CONFIG | {"private_redirect_uri": ""}
+    assert approved_identity_config(pending)
+    assert not initial_identity_config(pending)
+    assert not approved_identity_config(pending | {"owner_approval_recorded": False})
+    assert not approved_identity_config(pending | {"frontend_client_id": API})
 
 
 @pytest.mark.parametrize(

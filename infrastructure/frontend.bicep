@@ -18,6 +18,8 @@ param frontendClientSecret string
 @description('HTTPS SAS URL scoped to the private auth-tokens container; read/write/delete only.')
 param tokenStoreSasUrl string
 param appName string = 'sql-intelligence-web'
+@description('Keep ingress off on first deployment. Enable only after reading back owner-only Easy Auth.')
+param enablePrivateIngress bool = false
 
 resource environment 'Microsoft.App/managedEnvironments@2025-07-01' existing = { name: environmentName }
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = { name: frontendIdentityName }
@@ -33,7 +35,12 @@ resource app 'Microsoft.App/containerApps@2025-07-01' = {
       registries: [{ server: registryServer, identity: identity.id }]
       // external:true permits the PRIVATE VNet browser route outside this internal ACA environment.
       // Never use this template with an external environment; private_preflight rejects that state.
-      ingress: { external: true, targetPort: 8501, allowInsecure: false, transport: 'http' }
+      ingress: enablePrivateIngress ? {
+        external: true
+        targetPort: 8501
+        allowInsecure: false
+        transport: 'http'
+      } : null
       secrets: [
         { name: 'entra-client-secret', value: frontendClientSecret }
         { name: 'token-store-sas', value: tokenStoreSasUrl }
@@ -97,4 +104,4 @@ resource authentication 'Microsoft.App/containerApps/authConfigs@2025-07-01' = {
 }
 
 // Keep the API access switch OFF until this resource is deployed and private auth acceptance passes.
-output privateFrontendFqdn string = app.properties.configuration.ingress.fqdn
+output privateFrontendFqdn string = enablePrivateIngress ? app.properties.configuration.ingress.fqdn : ''

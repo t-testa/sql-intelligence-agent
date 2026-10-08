@@ -28,14 +28,24 @@ def read_cli(command: str, *args: str) -> Any:
     return json.loads(result.stdout)
 
 
-def initial_identity_config(config: dict[str, Any]) -> bool:
+def approved_identity_config(config: dict[str, Any]) -> bool:
+    """Permit metadata inspection before Azure has assigned the private callback hostname."""
     try:
         for name in ("tenant_id", "approved_user_object_id", "api_client_id", "frontend_client_id"):
             UUID(config[name])
-        redirect = urlsplit(config["private_redirect_uri"])
         return bool(
             config.get("owner_approval_recorded") is True
             and config["api_client_id"] != config["frontend_client_id"]
+        )
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return False
+
+
+def initial_identity_config(config: dict[str, Any]) -> bool:
+    try:
+        redirect = urlsplit(config["private_redirect_uri"])
+        return bool(
+            approved_identity_config(config)
             and redirect.scheme == "https"
             and redirect.hostname
             and not redirect.username
@@ -130,12 +140,16 @@ def main() -> int:
                         False,
                         "GitHub CLI unavailable/unauthorized; verify through the connected GitHub tool.",
                     )
-            if configured:
+            if isinstance(config, dict) and approved_identity_config(config):
                 try:
                     account = read_cli("az", "account", "show", "--output", "json")
                     if account.get("tenantId") != config["tenant_id"]:
                         raise RuntimeError("Wrong tenant")
                     record("azure_cli_approved_tenant", True)
+                    operator = read_cli("az", "ad", "signed-in-user", "show", "--output", "json")
+                    if operator.get("id") != config["approved_user_object_id"]:
+                        raise RuntimeError("Signed-in operator is not the approved owner")
+                    record("azure_cli_approved_owner", True)
                     api = read_cli(
                         "az", "ad", "app", "show", "--id", config["api_client_id"], "--output", "json"
                     )
@@ -167,6 +181,11 @@ def main() -> int:
                             "az", "ad", "sp", "show", "--id", config[f"{kind}_client_id"], "--output", "json"
                         )
                         principals[kind] = sp
+                        record(
+                            f"{kind}_sign_in_enabled",
+                            sp.get("accountEnabled") is True,
+                            "Keep disabled until the private callback and authentication are configured.",
+                        )
                         assignments = read_cli(
                             "az",
                             "rest",

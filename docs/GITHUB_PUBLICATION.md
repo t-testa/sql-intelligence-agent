@@ -72,3 +72,12 @@ publication manifests/configured-secret checks and `github-publication-tests.xml
 private repository, uses read-only repository permissions and contains no Azure deployment step.
 The remaining Azure authentication and deployment gates are in
 [private verification](PRIVATE_VERIFICATION.md).
+
+## October 8 Azure preflight update
+
+The later [Azure preflight](AZURE_PREFLIGHT_2026-10-08.md) adds reviewed infrastructure/runbook changes
+and one identity-gate regression test. Candidate/history Gitleaks scans found zero secrets; the
+configured-secret audit checked all Git objects and four local credentials without revealing their
+values. Private identity/ARM inputs, disposable what-if input and raw cloud evidence remain ignored.
+The complete Windows suite passed 467/467, including 220 security cases; local shortcuts and fixtures
+were preserved. Repository visibility is rechecked before the authorized private push.
