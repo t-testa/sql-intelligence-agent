@@ -72,7 +72,7 @@ actual tenant sign-in and private platform acceptance remain blocked pending app
 Run commands from:
 
 ```powershell
-Set-Location 'C:\Users\Tony\Documents\ChatGPT\SQL Database Agent\sql-intelligence-agent'
+Set-Location path\to\sql-intelligence-agent
 ```
 
 1. Privately edit the existing ignored `.env`. Preserve its SQL passwords and local API token. Set
