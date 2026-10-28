@@ -1,12 +1,6 @@
 # SQL Intelligence Agent
 
-**Private source • Private Azure application • Owner-approved Entra access only**
-
-This complete repository must remain **PRIVATE**. Application access and GitHub source access are
-granted and revoked independently. A separate sanitized public showcase is planned only after explicit
-content approval; no application source, executable backend, secrets or usable endpoints will be public.
-GitHub API metadata confirmed [t-testa/sql-intelligence-agent](https://github.com/t-testa/sql-intelligence-agent)
-is **private**, with Pages disabled, on October 8, 2026. See the [source publication audit](docs/GITHUB_PUBLICATION.md).
+*Portfolio project on synthetic data. It runs locally in mock mode with no cloud account; the Azure deployment material is documentation only.*
 
 **Ask a business question. Inspect the SQL. Verify the answer. Learn how the query works.**
 
@@ -218,9 +212,7 @@ DNS resolver needs a separate quote. This is not an approved total. Continuous s
 Identity and predeployment checks must finish before requesting provisioning approval; real platform
 and SQL acceptance follow approved private provisioning before application use.
 
-**No new billable resources, access grants, collaborators or public publication are authorized.**
-The [showcase plan](docs/PUBLIC_SHOWCASE_APPROVAL.md) defines permitted sanitized content for later
-review; no separate showcase has been created or published. The full source stays private.
+The Azure templates are prepared but have not been deployed.
 
 ## Limits and known risks
 
@@ -237,7 +229,7 @@ review; no separate showcase has been created or published. The full source stay
 
 Repository map: `backend/` API, agent, policy and database adapters; `frontend/` UI; `sql/` schema,
 views and baseline fixtures; `scripts/` local bootstrap/evaluation; `tests/` regressions;
-`evaluation/` private synthetic evidence; `infrastructure/` undeployed private templates.
+`evaluation/` synthetic evaluation evidence; `infrastructure/` undeployed private templates.
 
 Stop locally with `docker compose stop`. `docker compose down` preserves the database volume.
 Only use `docker compose down -v` when intentionally deleting this project's synthetic databases.
